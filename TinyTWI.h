@@ -5,10 +5,11 @@
 #include <stddef.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 
-#define DDR_TWI DDRB
-#define PORT_TWI PORTB
-#define PIN_TWI PINB
+#define DDR_TWI DDRB // data direction register
+#define PORT_TWI PORTB //write register
+#define PIN_TWI PINB //read register
 #define SDA 0x00
 #define SCL 0x02
 // TIMSK_I2C TIMSK
