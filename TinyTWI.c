@@ -46,15 +46,16 @@ void tinyTWI_init(){
 }
 
 void twi_start(){
-    PORT_I2C |= (1 << SCL_I2C);
-    while ((PIN_I2C & (1 << SCL_I2C)) == 0);
-    __delay();
-    PORT_I2C &= ~(1 << SDA_I2C);
-    __delay2();
-    PORT_I2C &= ~(1 << SCL_I2C);
-    while ((PIN_I2C & (1 << SCL_I2C)) != 0);
-    PORT_I2C |= (1 << SDA_I2C);
-    return USISR & (1 << USISIF);
+    // next 2 lines should not be necessary ??
+    //PORT_TWI |= (1 << SCL); // set clock high 
+    //while ((PIN_TWI & (1 << SCL)) == 0); // wait for clock to read high
+    //__dwell_high();  
+    PORT_TWI &= ~(1 << SDA); // set SDA low
+    __dwell_low();
+    PORT_TWI &= ~(1 << SCL); // set clock low
+    while ((PIN_TWI & (1 << SCL)) != 0); // wait for clock to go low
+    PORT_TWI |= (1 << SDA); // set SDA high
+    return USISR & (1 << USISIF); // check for the start condition interrupt flag. in this mode it doesn't trigger an interrupt though?
 }
 
 void twi_stop(){
