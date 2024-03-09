@@ -1,15 +1,29 @@
-#include <Wire.h>
+#include <TinyTWI.h>
 
 // the setup function runs once when you press reset or power the board
-void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
-}
+int main(){
+    char screen_addr = 0x3e; // TODO: replace with actual address
+    //initialize i2c
+    twi_init();
 
-// the loop function runs over and over again forever
-void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);                       // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
+
+    while(1){
+        //ADC
+        // 10-bit
+        // 1024 steps
+        // resolution ~5mv (4.882813) at 5v vcc
+        //measure battery voltage
+        //adc sleep?
+
+        //calculate battery percentage estimate
+        //calculate time-to-empty
+        //update screen
+        //** ads **
+        // measure cell voltage
+        // transmit "bat low" if needed
+        // low power shut-off?
+        // low power beep?
+        // sleep for 500ms?update screen
+        
+    }
 }
