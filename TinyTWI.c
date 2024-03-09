@@ -1,7 +1,7 @@
 #include "TinyTWI.h"
 
-#define __dwell_low()  _delay_us(4.7)
-#define __dwell_high() _delay_us(4)
+#define __dwell_long()  _delay_us(4.7) //high
+#define __dwell_short() _delay_us(4) //low
 
 // refer to section 15 (pg.108) of the ATtiny25/45/85 Datasheet for more information
 void tinyTWI_init(){
@@ -36,33 +36,29 @@ void tinyTWI_init(){
 }
 
 
-// Write
-{
-    PORT_I2C &= ~(1 << SCL_I2C); //  set clk low
-    while ((PIN_I2C & (1 << SCL_I2C)) != 0); // spin wait for pin to pull low ?
-    xfer(data, false); //transfer full byte
-    DDR_I2C &= ~(1 << SDA_I2C); //switch to read
-    return (xfer(0xff, true) & (1 << 0)) == 0; // return ACK or NACK
-}
-
 void twi_start(){
-    // next 2 lines should not be necessary ??
-    //PORT_TWI |= (1 << SCL); // set clock high 
-    //while ((PIN_TWI & (1 << SCL)) == 0); // wait for clock to read high
-    //__dwell_high();  
+    // outputs i2c start condition
+    __dwell_short();  // just in case time-padding
     PORT_TWI &= ~(1 << SDA); // set SDA low
-    __dwell_low();
+    __dwell_long();
     PORT_TWI &= ~(1 << SCL); // set clock low
     while ((PIN_TWI & (1 << SCL)) != 0); // wait for clock to go low
-    PORT_TWI |= (1 << SDA); // set SDA high
-    return USISR & (1 << USISIF); // check for the start condition interrupt flag. in this mode it doesn't trigger an interrupt though?
 }
 
 void twi_stop(){
-
+    // outputs i2c stop condition
+    PORT_TWI |= (1 << SCL); // set SCL high
+    while ((PIN_I2C & (1 << SCL_I2C)) == 0); //wait for SCL high
+    __dwell_short()
+    PORT_TWI |= (1 << SDA); // pull SDA high
+    __dwell_long(); // just in case time-padding
 }
 
 bool twi_transfer(char buff, bool bit, xfer_type mode){
+    //params:
+    // buff - potential byte to write
+    // bit - r/w single bit?
+    // mode - transfer type is READ or WRITE
     if(mode == WRITE){
         DDR_TWI |= (1 << SDA) // data direction : write
         USIDR = buff; // move the data to the USI data register
@@ -75,27 +71,24 @@ bool twi_transfer(char buff, bool bit, xfer_type mode){
         USISR |= (0xE << USICNT0); //overflow with 1 bit
     }   
     
-
-    // following loop with shift the data register onto the sda line by toggling the clock
+    // following loop will shift the data register onto the sda line (or vice versa depending on ddr setting) by toggling the clock
     do {
-        __dwell_low();
+        __dwell_long();
         USICR |= (1 << USITC); // toggle the clock
-        while ((PIN_I2C & (1 << SCL_I2C)) == 0); //wait for set
-        __dwell_high();
+        while ((PIN_TWI & (1 << SCL)) == 0); //wait for set
+        __dwell_short();
 
         USICR |= (1 << USITC); // toggle the clock
-        while ((PIN_I2C & (1 << SCL_I2C)) != 0); //wait for set
+        while ((PIN_TWI & (1 << SCL)) != 0); //wait for set
     }
     while((USISR & (1 << USIOIF)) == 0); // Check for counter overflow
 }
 
 int twi_transmission (char addr, char* buff, char mode){
-    //sda brought low
-    //scl brought low
-    //delay one clk
+    twi_start();
 
-    //write address [0:6]
-    //write "" bit [7]
+
+    // Transmission Setup
     // Concatenate the address and transmit mode
     addr |= (addr << 1) | (mode);
     twi_transfer(addr, false, WRITE);
@@ -108,12 +101,12 @@ int twi_transmission (char addr, char* buff, char mode){
         do{
             // write next byte [0:7]
             twi_write();
+            twi_read()
             // read ack
             // check for end of buffer (for our purposes it will be null terminated)
             // ** end **
-        }while(!*++buff)
+        }while(!*++buff);
     }
 
-    //scl brought high
-    //sda brought high
+    twi_stop();
 }
