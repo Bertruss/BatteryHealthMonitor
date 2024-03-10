@@ -5,7 +5,11 @@
 #define __dwell_short() _delay_us(4) //low
 
 // refer to section 15 (pg.108) of the ATtiny25/45/85 Datasheet for more information
+
+
 void tinyTWI_init(){
+    //initialize USI for I2C/TWI
+
     //intialize Data Direction on sda and scl as output val
     DDR_TWI |= (1 << SCL) | (1 << SDA)
 
@@ -36,7 +40,6 @@ void tinyTWI_init(){
             (1 << USIDC); //Clear Data Output Collision
 }
 
-
 void twi_start(){
     // outputs i2c start condition
     __dwell_short();  // just in case time-padding
@@ -55,7 +58,11 @@ void twi_stop(){
     __dwell_long(); // just in case time-padding
 }
 
-uint8_t twi_transfer(uint8_t buff, bool bit, xfer_type mode){
+inline bool read_ack(){
+    return (0x01 & twi_byte_transfer(0xff, true, READ))
+}
+
+uint8_t twi_byte_transfer(uint8_t buff, bool bit, xfer_type mode){
     //params:
     // buff - potential byte to write
     // bit - r/w single bit?
@@ -73,13 +80,13 @@ uint8_t twi_transfer(uint8_t buff, bool bit, xfer_type mode){
     
     // following loop will shift the data register onto the sda line (or vice versa depending on ddr setting) by toggling the clock
     do {
-        __dwell_long(); \\ just in case
+        __dwell_long(); 
         USICR |= (1 << USITC); // toggle the clock
-        while ((PIN_TWI & (1 << SCL)) == 0); //wait for set
+        while ((PIN_TWI & (1 << SCL)) == 0); //wait for set LOW
+       
         __dwell_short();
-
         USICR |= (1 << USITC); // toggle the clock
-        while ((PIN_TWI & (1 << SCL)) != 0); //wait for set
+        while ((PIN_TWI & (1 << SCL)) != 0); //wait for set HIGH
     }
     while((USISR & (1 << USIOIF)) == 0); // Check for counter overflow
 
@@ -88,31 +95,40 @@ uint8_t twi_transfer(uint8_t buff, bool bit, xfer_type mode){
     return data;
 }
 
-bool twi_transmission (uint8_t addr, uint8_t* buff, xfer_type mode){
+bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, xfer_type mode){
     twi_start();
 
     // Transmission Setup
     // Concatenate the address and transmit mode
-    addr |= (addr << 1) & ~(0x01);
-    twi_transfer(addr, false, WRITE);
-    if(twi_transfer(0xff, true, READ)){ // check ack
+    addr |= (addr << 1) | mode;
+    twi_byte_transfer(addr, false, WRITE);
+    if(read_ack()){ // check ack
         return false; // ACK failed
     }
     
     // Read or Write loop
-    if(mode == WRITE){
-        do{
-            // read/write next byte [0:7]
-            twi_transfer(*buff, false, mode);
-            twi_transfer(, false, mode);
-            
-            // read ack
-            // check for end of buffer (for our purposes it will be null terminated)
-            // ** end **
-        }while(!*++buff);
-    }else{
+    do{
+        // read/write next byte
+        // I really think this command should handle both read AND write
+        *buff = twi_byte_transfer(*buff, false, mode);
 
+        if(mode){ // WRITE
+            // read ack
+            if(read_ack()){ // check ack
+                twi_stop();
+                return false; // ACK failed, transmission error
+            }
+        }else{ // READ
+            // write ack
+            twi_byte_transfer(0xff, false, WRITE); 
+        }
+        buff++; // shift buffer pointer/index forward
+    }while(--length);
+
+    //if read mode, end with NACK
+    if(mode == READ){
+        twi_byte_transfer(0xff, true, READ);
     }
-    
     twi_stop();
+    return true;
 }

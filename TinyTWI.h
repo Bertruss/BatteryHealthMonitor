@@ -3,6 +3,7 @@
 #define TINYTWI 
 
 #include <stddef.h>
+#include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -21,8 +22,9 @@ enum xfer_type{
 // TIMER_VECT_I2C TIMER0_COMPA_vect
 
 void twi_init();
-bool twi_transfer(char buff, bool bit, xfer_type mode);
-bool twi_transmission (char addr, char* buff, xfer_type mode);
 void twi_start();
 void twi_stop();
+inline bool read_ack();
+bool twi_byte_transfer(char buff, bool bit, xfer_type mode);
+bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, xfer_type mode);
 #endif
