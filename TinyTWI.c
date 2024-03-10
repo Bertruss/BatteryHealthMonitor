@@ -1,4 +1,5 @@
 #include "TinyTWI.h"
+#include "stdint.h"
 
 #define __dwell_long()  _delay_us(4.7) //high
 #define __dwell_short() _delay_us(4) //low
@@ -54,7 +55,7 @@ void twi_stop(){
     __dwell_long(); // just in case time-padding
 }
 
-bool twi_transfer(char buff, bool bit, xfer_type mode){
+uint8_t twi_transfer(uint8_t buff, bool bit, xfer_type mode){
     //params:
     // buff - potential byte to write
     // bit - r/w single bit?
@@ -64,7 +65,6 @@ bool twi_transfer(char buff, bool bit, xfer_type mode){
         USIDR = buff; // move the data to the USI data register
     }else{ // READ
         DDR_TWI &= ~(1 << SDA) // data direction : read
-        //USIDR = 0xff; // doesn't matter
     }
 
     if(bit){ //only read or write single bit
@@ -73,7 +73,7 @@ bool twi_transfer(char buff, bool bit, xfer_type mode){
     
     // following loop will shift the data register onto the sda line (or vice versa depending on ddr setting) by toggling the clock
     do {
-        __dwell_long();
+        __dwell_long(); \\ just in case
         USICR |= (1 << USITC); // toggle the clock
         while ((PIN_TWI & (1 << SCL)) == 0); //wait for set
         __dwell_short();
@@ -82,31 +82,37 @@ bool twi_transfer(char buff, bool bit, xfer_type mode){
         while ((PIN_TWI & (1 << SCL)) != 0); //wait for set
     }
     while((USISR & (1 << USIOIF)) == 0); // Check for counter overflow
+
+    __dwell_long();
+    uint8_t data = USIDR;
+    return data;
 }
 
-int twi_transmission (char addr, char* buff, char mode){
+bool twi_transmission (uint8_t addr, uint8_t* buff, xfer_type mode){
     twi_start();
-
 
     // Transmission Setup
     // Concatenate the address and transmit mode
-    addr |= (addr << 1) | (mode);
+    addr |= (addr << 1) & ~(0x01);
     twi_transfer(addr, false, WRITE);
-
-    //// ** data loop **
-    if(mode){ //DATA READ
-        //nope
+    if(twi_transfer(0xff, true, READ)){ // check ack
+        return false; // ACK failed
     }
-    else{   //DATA WRITE
+    
+    // Read or Write loop
+    if(mode == WRITE){
         do{
-            // write next byte [0:7]
-            twi_write();
-            twi_read()
+            // read/write next byte [0:7]
+            twi_transfer(*buff, false, mode);
+            twi_transfer(, false, mode);
+            
             // read ack
             // check for end of buffer (for our purposes it will be null terminated)
             // ** end **
         }while(!*++buff);
-    }
+    }else{
 
+    }
+    
     twi_stop();
 }
