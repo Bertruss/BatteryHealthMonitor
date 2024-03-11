@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -21,10 +22,10 @@ enum xfer_type{
 // TIMSK_I2C TIMSK
 // TIMER_VECT_I2C TIMER0_COMPA_vect
 
-void twi_init();
-void twi_start();
-void twi_stop();
-inline bool read_ack();
-bool twi_byte_transfer(char buff, bool bit, xfer_type mode);
-bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, xfer_type mode);
+void twi_init(void);
+void twi_start(void);
+void twi_stop(void);
+inline bool read_ack(void);
+uint8_t twi_byte_transfer(uint8_t buff, bool bit, enum xfer_type mode); 
+bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, enum xfer_type mode);
 #endif

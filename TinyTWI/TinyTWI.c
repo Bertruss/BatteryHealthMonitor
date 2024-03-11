@@ -1,13 +1,14 @@
 #include "TinyTWI.h"
-#include "stdint.h"
-
+#include <stdint.h>
+#include <stdbool.h>
+#include <util/delay.h>
 #define __dwell_long()  _delay_us(4.7) //high
 #define __dwell_short() _delay_us(4) //low
 
 // refer to section 15 (pg.108) of the ATtiny25/45/85 Datasheet for more information
 
 
-void tinyTWI_init(){
+void tinyTWI_init(void){
     //initialize USI for I2C/TWI
 
     //intialize Data Direction on sda and scl as output val
@@ -40,7 +41,7 @@ void tinyTWI_init(){
             (1 << USIDC); //Clear Data Output Collision
 }
 
-void twi_start(){
+void twi_start(void){
     // outputs i2c start condition
     __dwell_short();  // just in case time-padding
     PORT_TWI &= ~(1 << SDA); // set SDA low
@@ -49,29 +50,29 @@ void twi_start(){
     while ((PIN_TWI & (1 << SCL)) != 0); // wait for clock to go low
 }
 
-void twi_stop(){
+void twi_stop(void){
     // outputs i2c stop condition
     PORT_TWI |= (1 << SCL); // set SCL high
-    while ((PIN_I2C & (1 << SCL_I2C)) == 0); //wait for SCL high
-    __dwell_short()
+    while ((PIN_TWI & (1 << SCL)) == 0); //wait for SCL high
+    __dwell_short();
     PORT_TWI |= (1 << SDA); // pull SDA high
     __dwell_long(); // just in case time-padding
 }
 
-inline bool read_ack(){
-    return (0x01 & twi_byte_transfer(0xff, true, READ))
+inline bool read_ack(void){
+    return (0x01 & twi_byte_transfer(0xff, true, READ));
 }
 
-uint8_t twi_byte_transfer(uint8_t buff, bool bit, xfer_type mode){
+uint8_t twi_byte_transfer(uint8_t buff, bool bit, enum xfer_type mode){
     //params:
     // buff - potential byte to write
     // bit - r/w single bit?
     // mode - transfer type is READ or WRITE
     if(mode == WRITE){
-        DDR_TWI |= (1 << SDA) // data direction : write
+        DDR_TWI |= (1 << SDA); // data direction : write
         USIDR = buff; // move the data to the USI data register
     }else{ // READ
-        DDR_TWI &= ~(1 << SDA) // data direction : read
+        DDR_TWI &= ~(1 << SDA); // data direction : read
     }
 
     if(bit){ //only read or write single bit
@@ -95,7 +96,7 @@ uint8_t twi_byte_transfer(uint8_t buff, bool bit, xfer_type mode){
     return data;
 }
 
-bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, xfer_type mode){
+bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, enum xfer_type mode){
     twi_start();
 
     // Transmission Setup
