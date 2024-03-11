@@ -8,7 +8,7 @@
 // refer to section 15 (pg.108) of the ATtiny25/45/85 Datasheet for more information
 
 
-void tinyTWI_init(void){
+void twi_init(void){
     //initialize USI for I2C/TWI
 
     //intialize Data Direction on sda and scl as output val
