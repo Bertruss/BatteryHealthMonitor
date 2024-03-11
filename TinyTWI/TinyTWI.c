@@ -12,10 +12,10 @@ void tinyTWI_init(void){
     //initialize USI for I2C/TWI
 
     //intialize Data Direction on sda and scl as output val
-    DDR_TWI |= (1 << SCL) | (1 << SDA)
+    DDR_TWI |= (1 << SCL) | (1 << SDA);
 
     //initialize sda and scl to "high", default state
-    PORT_TWI  |= (1 << SCL) | (1 << SDA)
+    PORT_TWI  |= (1 << SCL) | (1 << SDA);
 
     // Set the data register on the USI port
     USIDR = 0xFF;
