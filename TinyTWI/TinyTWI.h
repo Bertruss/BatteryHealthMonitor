@@ -25,7 +25,6 @@ enum xfer_type{
 void twi_init(void);
 void twi_start(void);
 void twi_stop(void);
-inline bool read_ack(void);
 uint8_t twi_byte_transfer(uint8_t buff, bool bit, enum xfer_type mode); 
 bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, enum xfer_type mode);
 #endif
