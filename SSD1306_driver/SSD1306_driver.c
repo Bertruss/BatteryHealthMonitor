@@ -1,8 +1,8 @@
 #include "TinyTWI.h"
 #include "SSD1306_driver.h"
 #include "fnt.h"
-#include "fcpu.h"
-#include <util/delay.h>
+#include "TinyEeprom.h"
+
 uint8_t cursor_pg = 0;
 uint8_t cursor_col = 0;
 
@@ -34,8 +34,8 @@ void SSD1306_init(){
 
 void SSD1306_write_char(char val){
     //retrieve address of character bitmap from eeprom
-    characterLookup(val);
-    char buffer[5] = {0x00,0x78,0xA4,0xA4,0x18}; //debug
+    uint8_t addr = characterLookup(val);
+    char *char_buffer = eeprom_read(addr, 5);
     uint8_t *write_buffer = malloc(2);
     write_buffer[0] = 0x40;
 	// this thing is d u m b. 
@@ -58,6 +58,8 @@ void SSD1306_write_char(char val){
 		twi_transmission (SCREEN_ADDR, write_buffer, 2, WRITE);
         SSD1306_set_cursor(--cursor_pg, ++cursor_col);
     }
+    free(write_buffer);
+    free(char_buffer);
 }
 
 void SSD1306_set_cursor(uint8_t page, uint8_t col){
