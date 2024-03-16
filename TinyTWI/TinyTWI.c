@@ -1,3 +1,4 @@
+#include "fcpu.h"
 #include "TinyTWI.h"
 #include <stdint.h>
 #include <stdbool.h>
@@ -109,7 +110,7 @@ bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, enum xfer_t
     twi_start();
     // Transmission Setup
     // Concatenate the address and transmit mode
-    char ack;
+    uint8_t ack;
 	addr = (addr << 1) | mode;
     twi_byte_transfer(addr, false, WRITE);
 	if(twi_byte_transfer(0x00, true, READ) != 0x00){ // check ack
