@@ -30,36 +30,6 @@ void SSD1306_init(){
 	twi_transmission(SCREEN_ADDR, &initialization, 22, WRITE);
 }
 
-void SSD1306_write_char(char val){
-	//retrieve address of character bitmap from eeprom
-	uint8_t addr = characterLookup(val);
-	uint8_t char_buffer[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
-	if(val != ' '){
-		eeprom_read(&char_buffer, addr, 5);
-	}
-	uint8_t write_buffer[2] = {0x40, 0x00};
-	// this thing is d u m b.
-	for(uint8_t i = 0; i < 5; i++){
-		cursor_pg = 0;
-		//pull first column
-		write_buffer[1] =
-		((char_buffer[i] & 0x80) >> 7) +
-		((char_buffer[i] & 0x40) >> 4) +
-		((char_buffer[i] & 0x20) >> 1) +
-		((char_buffer[i] & 0x10) << 2);
-		//write slice
-		twi_transmission (SCREEN_ADDR, write_buffer, 2, WRITE);
-		SSD1306_set_cursor(++cursor_pg, cursor_col);
-		write_buffer[1] =
-		((char_buffer[i] & 0x08) >> 3) +
-		((char_buffer[i] & 0x04)) +
-		((char_buffer[i] & 0x02) << 3) +
-		((char_buffer[i] & 0x01) << 6);
-		twi_transmission (SCREEN_ADDR, write_buffer, 2, WRITE);
-		SSD1306_set_cursor(--cursor_pg, ++cursor_col);
-	}
-}
-
 void SSD1306_set_cursor(uint8_t page, uint8_t col){
 	// set position of write operation
 	// page must be less than 8
@@ -78,13 +48,21 @@ void SSD1306_reset_cursor(){
 
 void SSD1306_clear(){
 	//clears the whole screen
-	SSD1306_set_cursor(0,0);
+	for(int i = 0; i < 8; i++){
+        SSD1306_clear_segment(i, 0, 127);
+    }
+}
+
+void SSD1306_clear_segment(uint8_t pg, uint8_t start_col, uint8_t end_col){
+	//clears section of screen
+	SSD1306_set_cursor(pg, start_col);
 	twi_start();
 	twi_byte_transfer((SCREEN_ADDR << 1), false, WRITE);
+    uint8_t len = end_col - start_col + 1;
 	if(twi_byte_transfer(0x00, true, READ) == 0x00){// read ack
 		twi_byte_transfer(0x40, false, WRITE);
 		twi_byte_transfer(0x00, true, READ); // read ack
-		for(int i = 0; i < 1024; i++){
+		for(int i = 0; i < len; i++){
 			twi_byte_transfer(0x00, false, WRITE);
 			twi_byte_transfer(0x00, true, READ); // read ack
 		}
