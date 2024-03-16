@@ -129,7 +129,7 @@ bool twi_transmission (uint8_t addr, uint8_t* buff, uint16_t length, enum xfer_t
 	
     //if read mode, end with NACK
     if(mode == READ){
-        twi_byte_transfer(0x00, true, WRITE);
+        twi_byte_transfer(0x01, true, WRITE);
     }
 	
     twi_stop();
