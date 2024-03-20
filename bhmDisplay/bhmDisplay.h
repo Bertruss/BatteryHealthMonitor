@@ -13,3 +13,11 @@ uint8_t graphics[16] = {
 char charge_txt[6] = {'C', 'H', 'A', 'R', 'G', 'E'}; 
 char time_txt[9] = {'E', 'S', 'T', '.', ' ', 'T', 'I', 'M', 'E'}; // might be too ambitious
 char warning_txt[24] = {'B', 'A', 'T', 'T', 'E', 'R', 'Y', ' ', 'L','E','V','E','L',' ','C','R','I','T','I','C','A','L'};
+
+void display_write_char(char val);
+void display_write_char_2x(char val);
+void draw_graphic(uint8_t addr);
+void draw_percent_bar(uint8_t percent);
+void clear_warning();
+void display_warning();
+void display_percent(uint8_t val);
