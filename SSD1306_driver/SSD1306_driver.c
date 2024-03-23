@@ -70,3 +70,8 @@ void SSD1306_clear_segment(uint8_t pg, uint8_t start_col, uint8_t end_col){
 	}
 	SSD1306_reset_cursor();
 }
+
+void SSD1306_draw(uint8_t byte){
+		uint8_t write_buff[2] = {0x40, byte};
+		twi_transmission (SCREEN_ADDR, write_buff, 2, WRITE);
+}
