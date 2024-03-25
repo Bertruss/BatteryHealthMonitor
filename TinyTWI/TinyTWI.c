@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <util/delay.h>
-#define F_CPU 8000000UL
-
 #define __dwell_long() _delay_us(4.7) //low
 #define __dwell_short() _delay_us(4.0) //high
 
