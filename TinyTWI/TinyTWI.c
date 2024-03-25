@@ -1,13 +1,14 @@
-#include "fcpu.h"
 #include "TinyTWI.h"
+#include "fcpu.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <util/delay.h>
-#define __dwell_long() _delay_us(4.7) //low
-#define __dwell_short() _delay_us(4.0) //high
+
+// fast mode, delays shortened because of other overhead 
+#define __dwell_long() _delay_us(1.3) //low 1.3ns
+#define __dwell_short() _delay_us(.8) //high .6ns
 
 // refer to section 15 (pg.108) of the ATtiny25/45/85 Datasheet for more information
-
 
 void twi_init(void){
     //initialize USI for I2C/TWI
