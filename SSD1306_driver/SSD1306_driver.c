@@ -1,6 +1,5 @@
-#include "TinyTWI.h"
 #include "SSD1306_driver.h"
-#include "fnt.h"
+#include "TinyTWI.h"
 #include "TinyEeprom.h"
 
 uint8_t cursor_pg = 0;
