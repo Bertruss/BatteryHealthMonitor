@@ -1,4 +1,4 @@
-//bhmDisplay are a collection of graphics drawing functions specific to the battery health monitor use case.
+//bhmDisplay is a collection of graphics drawing functions specific to the battery health monitor use case.
 
 uint8_t graphics[16] = {
     0xff, 0xff, // endcap
@@ -10,10 +10,10 @@ uint8_t graphics[16] = {
     0x01, 0x04 // end - lightning bolt
 };
 
-char charge_txt[6] = {'C', 'H', 'A', 'R', 'G', 'E'}; 
-char time_txt[9] = {'E', 'S', 'T', '.', ' ', 'T', 'I', 'M', 'E'}; // might be too ambitious
-char warning_txt[24] = {'B', 'A', 'T', 'T', 'E', 'R', 'Y', ' ', 'L','E','V','E','L',' ','C','R','I','T','I','C','A','L'};
-char voltage_txt[13] = {'C','E','L','L',' ','V','O','L','T','A','G','E', ':'};
+const char charge_txt[6] = {'C', 'H', 'A', 'R', 'G', 'E'}; 
+const char time_txt[9] = {'E', 'S', 'T', '.', ' ', 'T', 'I', 'M', 'E'}; // might be too ambitious
+const char warning_txt[24] = {'B', 'A', 'T', 'T', 'E', 'R', 'Y', ' ', 'L','E','V','E','L',' ','C','R','I','T','I','C','A','L'};
+const char voltage_txt[13] = {'C','E','L','L',' ','V','O','L','T','A','G','E', ':'};
 
 void update_display();
 void display_write_char(char val);
