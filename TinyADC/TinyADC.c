@@ -1,21 +1,21 @@
 #include <avr/io.h>
+//ADC = Vin*1024/VREF
 
 void adc_init(){
-/*
-REFS[7,6,4] -> 000 
-Vcc selected as VREF
-TODO: consider alternative VREF
-*/
-ADMUX = (1 << MUX1) | // select ADC3 
-        (1 << MUX0); 
+    /*
+    REFS[7,6,4] -> 000 
+    Vcc selected as VREF
+    TODO: consider alternative VREF
+    */
+    ADMUX = (1 << MUX1) | // select ADC3 
+            (1 << MUX0); 
 
-ADCSRA = (1 << ADEN) | // enable the ADC
-        (1 << ADPS2) | // set the prescaler to 128. 8mhz/128 -> 62.5 khz
-        (1 << ADPS1) |
-        (1 << ADPS0) |
+    ADCSRA = (1 << ADEN) | // enable the ADC
+            (1 << ADPS2) | // set the prescaler to 128. 8mhz/128 -> 62.5 khz
+            (1 << ADPS1) |
+            (1 << ADPS0) |
 
-DIDR0 |= (1 << ADC3D) 
-
+    DIDR0 |= (1 << ADC3D) // disable the digital input buffer on the input pin
 }
 
 void adc_enable(){ 
