@@ -1,11 +1,14 @@
-#include <TinyTWI.h>
+#include "fcpu.h"
+#include <avr/io.h>
+#include <util/delay.h>
+#include "TinyTWI.h"
+#include "SSD1306_driver.h"
 
 // the setup function runs once when you press reset or power the board
 int main(){
-    char screen_addr = 0x3c; // TODO: replace with actual address
     //initialize i2c
     twi_init();
-    
+
 
     while(1){
         //ADC
@@ -24,6 +27,8 @@ int main(){
         // low power shut-off?
         // low power beep?
         // sleep for 500ms?update screen
+        
+        // testing the screen update
         
     }
 }
