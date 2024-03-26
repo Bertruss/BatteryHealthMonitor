@@ -1,7 +1,7 @@
 // note: this is only compliant with the port defs of the attiny25/45/85
-#ifndef TINYTWI
-#define TINYTWI 
-
+#ifndef TINY_TWI_H
+#define TINY_TWI_H
+#include "fcpu.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -17,10 +17,8 @@ enum xfer_type{
 #define DDR_TWI DDRB // data direction register
 #define PORT_TWI PORTB //write register
 #define PIN_TWI PINB //read register
-#define SDA 0x00
-#define SCL 0x02
-// TIMSK_I2C TIMSK
-// TIMER_VECT_I2C TIMER0_COMPA_vect
+#define SDA 0
+#define SCL 2
 
 void twi_init(void);
 void twi_start(void);

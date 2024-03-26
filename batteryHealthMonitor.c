@@ -2,10 +2,10 @@
 
 // the setup function runs once when you press reset or power the board
 int main(){
-    char screen_addr = 0x3e; // TODO: replace with actual address
+    char screen_addr = 0x3c; // TODO: replace with actual address
     //initialize i2c
     twi_init();
-
+    
 
     while(1){
         //ADC
