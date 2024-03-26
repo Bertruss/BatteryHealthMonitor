@@ -10,6 +10,7 @@ int main(){
     twi_init();
 
 
+
     while(1){
         //ADC
         // 10-bit
@@ -32,3 +33,5 @@ int main(){
         
     }
 }
+
+// 
