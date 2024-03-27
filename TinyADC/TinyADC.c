@@ -13,9 +13,9 @@ void adc_init(){
     ADCSRA = (1 << ADEN) | // enable the ADC
             (1 << ADPS2) | // set the prescaler to 128. 8mhz/128 -> 62.5 khz
             (1 << ADPS1) |
-            (1 << ADPS0) |
+            (1 << ADPS0);
 
-    DIDR0 |= (1 << ADC3D) // disable the digital input buffer on the input pin
+    DIDR0 |= (1 << ADC3D); // disable the digital input buffer on the input pin
 }
 
 void adc_enable(){ 
