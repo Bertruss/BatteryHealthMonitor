@@ -1,5 +1,6 @@
 #ifndef TINY_ADC_H
 #define TINY_ADC_H
+#include <stdint.h>
 // interface for ease of use of the ADC
 
 void adc_init();

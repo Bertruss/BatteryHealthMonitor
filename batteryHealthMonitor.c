@@ -1,16 +1,17 @@
-#include "fcpu.h"
+#include "./TinyTWI/fcpu.h"
+#include "./TinyTWI/TinyTWI.h"
+#include "./bhmDisplay/bhmDisplay.h"
+#include "./SSD1306_driver/SSD1306_driver.h"
 #include <avr/io.h>
 #include <util/delay.h>
-#include "TinyTWI.h"
-#include "SSD1306_driver.h"
 
 // the setup function runs once when you press reset or power the board
 int main(){
     //initialize i2c
     twi_init();
-
-
-
+	SSD1306_init();
+	SSD1306_clear();
+	
     while(1){
         //ADC
         // 10-bit
@@ -18,7 +19,10 @@ int main(){
         // resolution ~5mv (4.882813) at 5v vcc
         //measure battery voltage
         //adc sleep?
-
+		
+		for(uint8_t i = 0; i < 101; i++){
+			update_display(i, false, i);
+		}		
         //calculate battery percentage estimate
         //calculate time-to-empty
         //update screen

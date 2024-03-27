@@ -1,8 +1,10 @@
-#include "SSD1306_driver.h"
 #include "bhmDisplay.h"
-#include "fnt.h"
-#include "TinyTWI.h"
-#include "TinyEeprom.h"
+#include "../SSD1306_driver/SSD1306_driver.h"
+#include "../font/fnt.h"
+#include "../TinyTWI/TinyTWI.h"
+#include "../TinyEeprom/TinyEeprom.h"
+#include "../TinyADC/ADCscale.h"
+
 // bhmDisplay is a collection of graphics drawing functions specific to the battery health monitor use case.
 
 // width = 25;
@@ -224,8 +226,7 @@ void display_voltage(uint16_t value){
 	// convert val to display voltage
 	// TODO: rework with some bitwise operations. this may take a lot of cycles
 	// determine expected voltage range (8 - 6.4 for 2 cell?)
-	
-	uint8_t millivolt_quanta = 0x0F; //TODO: unknown scaling
+
 	uint16_t quanta_num;
 	quanta_num = value/millivolt_quanta;
 	uint8_t v = quanta_num/100;
