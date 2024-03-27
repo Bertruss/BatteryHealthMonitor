@@ -227,12 +227,20 @@ void display_voltage(uint16_t value){
 	// TODO: rework with some bitwise operations. this may take a lot of cycles
 	// determine expected voltage range (8 - 6.4 for 2 cell?)
 
-	uint16_t quanta_num;
-	quanta_num = value/millivolt_quanta;
-	uint8_t v = quanta_num/100;
-	quanta_num -= v * 100;  
-	uint8_t cv = quanta_num/10;
-	uint8_t mv = quanta_num - (cv * 10);  
+	uint32_t quanta_num;
+	uint32_t temp;
+	
+	quanta_num = value*quanta;
+	
+	temp = quanta_num/100;
+	quanta_num -= temp * 100;  
+	uint8_t v = temp >> 24;
+	
+	temp = quanta_num/10;
+	quanta_num -= temp *10;
+	uint8_t cv = temp >> 24;
+
+	uint8_t mv = quanta_num;  
 	SSD1306_set_cursor(2, 0);
 
 	for(int i = 0; i < 13; i++){
