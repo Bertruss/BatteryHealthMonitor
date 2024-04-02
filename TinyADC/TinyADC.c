@@ -1,4 +1,6 @@
 #include "TinyADC.h"
+#include "ADCscale.h"
+#include <avr/delay.h>
 #include <avr/io.h>
 //ADC = Vin*1024/VREF
 
@@ -6,8 +8,9 @@ void adc_init(){
     /*
     REFS[7,6,4] -> 000 
     Vcc selected as VREF
-    TODO: consider alternative VREF
     */
+
+   // TODO: consider making inputs more flexible
     ADMUX = (1 << MUX1) | // select ADC3 
             (1 << MUX0); 
 
@@ -37,7 +40,6 @@ uint16_t adc_read_sync(){
     ADCSRA |= (1 << ADSC);
     while((ADCSRA & (1 << ADIF)) == 0); // wait for the conversion to complete
     ADCSRA |= (1 << ADIF); // reset the conversion-finished flag
-    
 
     // The ADC generates a 10-bit result which is presented in the ADC Data Registers, ADCH and ADCL
     // ADCL must be read first, then ADCH
@@ -48,5 +50,29 @@ uint16_t adc_read_sync(){
     result = ADCL |
             (ADCH << 8);
     
+    return result;
+}
+
+uint16_t adc_measure_vcc(){
+    // Check Vcc by measuring 1.1v internal voltage reference, with Vcc as VREF. 
+    
+    // Set the input as the 1.1 ref, referred to as Vbg or 'Bandgap Voltage'
+    ADMUX = (1 << MUX3) | // select ADC3 
+            (1 << MUX2); 
+
+    // Note: VREF is still vcc, so the measured value of the 1.1 ref will inform on Vcc's deviation from 5v
+
+    // After switching to internal voltage reference the ADC requires a settling time of 1ms before measurements are sta-
+    // ble. Conversions starting before this may not be reliable. The ADC must be enabled during the settling time.
+    _delay_ms_(1);
+
+    // conversion started by writing a one to the ADC start conversion bit ADSC.
+    // this is held high until the conversion is completed.
+    adc_read_sync()
+    
+    ADMUX = (1 << MUX1) | // reset input selection 
+            (1 << MUX0); 
+
+    // reset the 
     return result;
 }
