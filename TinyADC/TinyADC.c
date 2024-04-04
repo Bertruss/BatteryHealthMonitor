@@ -66,13 +66,12 @@ uint16_t adc_measure_vcc(){
     // ble. Conversions starting before this may not be reliable. The ADC must be enabled during the settling time.
     _delay_ms_(1);
 
-    // conversion started by writing a one to the ADC start conversion bit ADSC.
-    // this is held high until the conversion is completed.
+    // normal value read
     adc_read_sync()
     
-    ADMUX = (1 << MUX1) | // reset input selection 
+    // reset input selection
+    ADMUX = (1 << MUX1) |  
             (1 << MUX0); 
 
-    // reset the 
     return result;
 }
