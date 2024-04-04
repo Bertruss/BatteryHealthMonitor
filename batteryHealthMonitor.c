@@ -9,6 +9,7 @@
 int main(){
     //initialize i2c
     twi_init();
+    adc_init();
 	SSD1306_init();
 	SSD1306_clear();
 	
@@ -18,8 +19,8 @@ int main(){
         // 1024 steps
         // resolution ~5mv (4.882813) at 5v vcc
         //measure battery voltage
-        //adc sleep?
-		
+        uint32_t voltage = read_battery_voltage();
+
 		for(uint8_t i = 0; i < 101; i++){
 			update_display(i, false, i);
 		}		
@@ -37,5 +38,3 @@ int main(){
         
     }
 }
-
-// 
