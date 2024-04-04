@@ -222,15 +222,9 @@ void display_percent_charge(uint8_t value){
 	write_char('%');
 }
 
-void display_voltage(uint16_t value){
+void display_voltage(uint32_t value){
 	// convert val to display voltage
 	// TODO: rework with some bitwise operations. this may take a lot of cycles
-	// determine expected voltage range (8 - 6.4 for 2 cell?)
-
-	uint32_t quanta_num;
-	uint32_t temp;
-	
-	quanta_num = value*quanta;
 	
 	temp = quanta_num/100;
 	quanta_num -= temp * 100;  
