@@ -1,6 +1,6 @@
 ## Helper scripts
 
-I used these scripts to prune and inspect the 5x8 pixel (so 5 byte) font style.
+I used these scripts to prune, inspect, and render to binary the 5x8 pixel (so 5 byte) font style.
 
 
 The data was copied from someone elses incredibly helpful repo of font styles and sizes. I really didn't want to 
