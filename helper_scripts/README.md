@@ -13,6 +13,8 @@ character font down to 51 characters to fit in the eeprom of the ATtiny45. 51 is
 
 
 credit to user basti79 for the original font: https://github.com/basti79/LCD-fonts/blob/master/5x8_vertikal_LSB_1.asm
+(NB: After slightly more digging, seems this is a re-upload from a post on a german microcontroller forum from 2006 and the 
+actual origin of these fonts is user benedikt, so thanks to him: https://www.mikrocontroller.net/topic/54860)
 
 Anyway, once that was done, I used the asccihex_to_realhex.py to convert the written out human readable hex to a raw
 binary file, exactly 256 bytes in length. output file is automatically given the extension '.hex'.
