@@ -1,6 +1,5 @@
 #include "TinyADC.h"
-#include "ADCscale.h"
-#include <avr/delay.h>
+#include <util/delay.h>
 #include <avr/io.h>
 //ADC = Vin*1024/VREF
 
@@ -64,14 +63,14 @@ uint16_t adc_measure_vcc(){
 
     // After switching to internal voltage reference the ADC requires a settling time of 1ms before measurements are sta-
     // ble. Conversions starting before this may not be reliable. The ADC must be enabled during the settling time.
-    _delay_ms_(1);
+    _delay_ms(1);
 
     // normal value read
-    adc_read_sync()
+    uint16_t result = adc_read_sync()
     
     // reset input selection
     ADMUX = (1 << MUX1) |  
-            (1 << MUX0); 
-
+            (1 << MUX0);
+			
     return result;
 }
