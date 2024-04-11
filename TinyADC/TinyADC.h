@@ -8,4 +8,5 @@ void adc_enable();
 void adc_pause();
 uint16_t adc_read_async();
 uint16_t adc_read_sync();
+uint16_t adc_measure_ref();
 #endif

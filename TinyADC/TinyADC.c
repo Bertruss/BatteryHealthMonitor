@@ -52,7 +52,7 @@ uint16_t adc_read_sync(){
     return result;
 }
 
-uint16_t adc_measure_vcc(){
+uint16_t adc_measure_ref(){
     // Check Vcc by measuring 1.1v internal voltage reference, with Vcc as VREF. 
     
     // Set the input as the 1.1 ref, referred to as Vbg or 'Bandgap Voltage'
@@ -66,7 +66,7 @@ uint16_t adc_measure_vcc(){
     _delay_ms(1);
 
     // normal value read
-    uint16_t result = adc_read_sync()
+    uint16_t result = adc_read_sync();
     
     // reset input selection
     ADMUX = (1 << MUX1) |  

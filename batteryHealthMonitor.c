@@ -14,7 +14,7 @@ int main(){
 	
     while(1){
         uint32_t voltage = measure_battery_voltage();
-        uint8_t percent_v = calculate_battery_percentage(voltage);
+        uint8_t percent_v = battery_percentage(voltage);
         bool batt_warn = percent_v > 15 ? false : true; // below 15% trigger battery warning
 		bool batt_warn_display = false;
 		update_display(percent_v, batt_warn, (uint16_t)(voltage >> 16));

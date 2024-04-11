@@ -228,11 +228,11 @@ void display_voltage(uint32_t value){
 	// determine expected voltage range (8 - 6.4 for 2 cell?)
 	
 	uint8_t v = value/100000000;
-	quanta_num = temp % 100000000;
+	value = value % 100000000;
 	
 	// pull the .1's place
 	uint8_t cv = value/10000000;
-	quanta_num = temp % 10000000;
+	value = value % 10000000;
 
 	// pull the .01's
 	uint8_t mv = value/1000000;
