@@ -3,7 +3,7 @@
 #include "../font/fnt.h"
 #include "../TinyTWI/TinyTWI.h"
 #include "../TinyEeprom/TinyEeprom.h"
-#include "../TinyADC/ADCscale.h"
+#include "../bhmUtils/ADCscale.h"
 
 // bhmDisplay is a collection of graphics drawing functions specific to the battery health monitor use case.
 
@@ -225,16 +225,18 @@ void display_percent_charge(uint8_t value){
 void display_voltage(uint32_t value){
 	// convert val to display voltage
 	// TODO: rework with some bitwise operations. this may take a lot of cycles
+	// determine expected voltage range (8 - 6.4 for 2 cell?)
 	
-	temp = quanta_num/100;
-	quanta_num -= temp * 100;  
-	uint8_t v = temp >> 24;
+	uint8_t v = value/100000000;
+	quanta_num = temp % 100000000;
 	
-	temp = quanta_num/10;
-	quanta_num -= temp *10;
-	uint8_t cv = temp >> 24;
+	// pull the .1's place
+	uint8_t cv = value/10000000;
+	quanta_num = temp % 10000000;
 
-	uint8_t mv = quanta_num;  
+	// pull the .01's
+	uint8_t mv = value/1000000;
+  
 	SSD1306_set_cursor(2, 0);
 
 	for(int i = 0; i < 13; i++){
