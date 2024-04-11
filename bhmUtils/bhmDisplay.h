@@ -4,13 +4,13 @@
 #include <stdbool.h>
 //bhmDisplay is a collection of graphics drawing functions specific to the battery health monitor use case.
 
-void update_display(uint8_t percent, bool warn, uint16_t voltage);
+void update_display(uint8_t percent, bool warn, uint32_t voltage);
 void display_write_char(char val);
 void display_write_char_2x(char val);
 void draw_graphic(uint8_t addr);
 void draw_percent_bar(uint8_t percent);
 void render_symbol(uint8_t address);
-void display_voltage(uint16_t value);
+void display_voltage(uint32_t value);
 void clear_warning();
 void display_warning();
 void display_percent_charge(uint8_t val);

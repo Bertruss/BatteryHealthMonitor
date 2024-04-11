@@ -31,7 +31,7 @@ char time_txt[9] = {'E', 'S', 'T', '.', ' ', 'T', 'I', 'M', 'E'}; // might be to
 char warning_txt[24] = {'B', 'A', 'T', 'T', 'E', 'R', 'Y', ' ', 'L','E','V','E','L',' ','C','R','I','T','I','C','A','L'};
 char voltage_txt[13] = {'C','E','L','L',' ','V','O','L','T','A','G','E', ':'};
 
-void update_display(uint8_t percent, bool warn, uint16_t voltage){
+void update_display(uint8_t percent, bool warn, uint32_t voltage){
 	draw_percent_bar(percent);
 	display_voltage(voltage);
 	// draw time estimate?
