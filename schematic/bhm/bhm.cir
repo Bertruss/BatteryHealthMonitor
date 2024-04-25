@@ -1,0 +1,14 @@
+.title KiCad schematic
+.save all
+.probe alli
+U3 __U3
+C1 +8.4V GND 0.33u
+R3 Net-_U2-XTAL1/PB3_ Net-_U1A-+_ 300k
+C2 GND Net-_U2-VCC_ 0.01u
+R2 Net-_U2-VCC_ Net-_U1A-+_ 300k
+U2 __U2
+R5 Net-_U1A--_ +8.4V 300k
+R4 Net-_U1A--_ GND 300k
+R1 Net-_U2-VCC_ Net-_U2-AREF/PB0_ 10k
+U1 __U1
+.end

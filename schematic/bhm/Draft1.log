@@ -1,0 +1,11 @@
+LTspice 24.0.9 for Windows
+Circuit: * C:\Users\Michael\Documents\projects\xplr\BatteryHealthMonitor\schematic\bhm\Draft1.asc
+Start Time: Thu Apr  4 21:08:58 2024
+solver = Normal
+Maximum thread count: 16
+tnom = 27
+temp = 27
+method = modified trap
+.dc sweep increment has wrong sign -- fixing...
+Total elapsed time: 0.031 seconds.
+

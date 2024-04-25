@@ -1,0 +1,4 @@
+LTspice 24.0.9 for Windows
+Circuit: .title KiCad schematic
+Start Time: Thu Apr  4 21:00:51 2024
+Fatal Error: Missing node(s) for uniform RC-line U3
