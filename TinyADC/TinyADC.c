@@ -1,7 +1,12 @@
 #include "TinyADC.h"
 #include <util/delay.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 //ADC = Vin*1024/VREF
+
+ISR(ADC_vect){
+	ADCSRA |= (1 << ADIF); // reset the conversion-finished flag
+}
 
 void adc_init(){
     /*
@@ -35,14 +40,12 @@ uint16_t adc_read(enum adc_mode mode){
 
     if(mode == WAKE){
         ADCSRA |= (1 << ADSC);
-        while((ADCSRA & (1 << ADIF)) == 0); // wait for the conversion to complete
+        while((ADCSRA & (1 << ADIF)) == 1); // wait for the conversion to complete
     }else{
         MCUCR |= (1 << SE) | // sleep enable, ADC noise reduction
-        (1 << SM0); 
+			(1 << SM0); 
     }
-    ADCSRA |= (1 << ADIF); // reset the conversion-finished flag
-
-
+    
     // The ADC generates a 10-bit result which is presented in the ADC Data Registers, ADCH and ADCL
     // ADCL must be read first, then ADCH
     // but can optionally be presented left adjusted by setting the ADLAR bit in
