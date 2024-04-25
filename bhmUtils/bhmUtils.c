@@ -8,6 +8,8 @@
 // though it should be noted, this does seem to give at least 2 decimal places free of quantization error.
 
 uint32_t measure_battery_voltage(){
+	adc_enable();
+	
     // measuring Vcc to apply Vref correction (should be ~5v but this step corrects for some innaccuracy)
     uint32_t ref = 1.1*10000/adc_measure_ref()*1024;
     
@@ -15,8 +17,10 @@ uint32_t measure_battery_voltage(){
 
     // Note: quanta is just hard-coded 5/1024
     // ref SHOULD equal current Vcc, so the error correction modifier is the ref/5 
-    uint32_t val = (adc_read_sync()*qaunta)/10000/5*ref + ref;
-
+    uint32_t val = (adc_read(SLEEP)*qaunta)/10000/5*ref + ref;
+	
+	// power-saving, disable ADC
+	adc_pause();
     return val;
 }
 
