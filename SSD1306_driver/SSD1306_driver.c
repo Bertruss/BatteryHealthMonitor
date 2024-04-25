@@ -17,7 +17,7 @@ uint8_t initialization[] = {
 	0x80, 0x7F, /* ^ end: col 127 */
 	0x80, 0x22, /* Reset Page Address (for horizontal addressing) */
 	0x80, 0x00, /* ^ start page 0 */
-	0x80, 0x07  /* ^ end page 7 */
+	0x80, 0x07, /* ^ end page 7 */
 	0x80, 0x81, /* Set Brightness */
 	0x80, 0x1F	/* ^ brightness val */
 };
@@ -31,7 +31,7 @@ uint8_t cursor_cmd[] = {
 uint8_t brightness_cmd[] = {
 	0x80, 0x81, // Brightness cmd
 	0x80, 0x00 // value
-}
+};
 
 void SSD1306_init(){
 	twi_transmission(SCREEN_ADDR, &initialization, 26, WRITE);
@@ -84,6 +84,6 @@ void SSD1306_draw(uint8_t byte){
 }
 
 void SSD1306_set_brightness(uint8_t val){
-	brightness_cmd[3] = val
+	brightness_cmd[3] = val;
 	twi_transmission (SCREEN_ADDR, brightness_cmd, 4, WRITE);
 }
