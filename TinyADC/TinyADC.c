@@ -29,16 +29,19 @@ void adc_pause(){
     ADCSRA &= !(1 << ADEN);
 }
 
-uint16_t adc_read_async(){ 
-    //TODO
-}
-
-uint16_t adc_read_sync(){ 
+uint16_t adc_read(enum adc_mode mode){ 
     // conversion started by writing a one to the ADC start conversion bit ADSC.
     // this is held high until the conversion is completed.
-    ADCSRA |= (1 << ADSC);
-    while((ADCSRA & (1 << ADIF)) == 0); // wait for the conversion to complete
+
+    if(mode == WAKE){
+        ADCSRA |= (1 << ADSC);
+        while((ADCSRA & (1 << ADIF)) == 0); // wait for the conversion to complete
+    }else{
+        MCUCR |= (1 << SE) | // sleep enable, ADC noise reduction
+        (1 << SM0); 
+    }
     ADCSRA |= (1 << ADIF); // reset the conversion-finished flag
+
 
     // The ADC generates a 10-bit result which is presented in the ADC Data Registers, ADCH and ADCL
     // ADCL must be read first, then ADCH
@@ -66,7 +69,7 @@ uint16_t adc_measure_ref(){
     _delay_ms(1);
 
     // normal value read
-    uint16_t result = adc_read_sync();
+    uint16_t result = adc_read(SLEEP);
     
     // reset input selection
     ADMUX = (1 << MUX1) |  
