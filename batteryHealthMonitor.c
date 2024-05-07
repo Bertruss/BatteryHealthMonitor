@@ -10,6 +10,26 @@ ISR(TIMER0_COMPA){ // toggle off the interrupt
     TIMSK &= !(1 << OCIE0A); // output compare timer0 registerA interrupt disable
 }
 
+/*
+Program cycle:
+**start**
+    [ADC low-power mode]
+        |
+        [measure voltage]
+        |
+        V
+    # ADC complete flag interrupt #
+    [calculate percentage]
+    [check for low batt]
+    [update screen]
+    [Deep Sleep]
+        |
+        |
+        V
+    # ~.5s timer interrupt #
+^loop
+*/
+
 int main(){
     cli();
     twi_init(); // Initialize i2c
