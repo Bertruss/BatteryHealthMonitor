@@ -1,8 +1,10 @@
 #include "SSD1306_driver.h"
 #include "../TinyTWI/TinyTWI.h"
-#include "../font/fnt.h"
-#include "../TinyEeprom/TinyEeprom.h"
 
+/* 
+ * 128x32 oled screen driver 
+ * Uses tinyTWI library
+*/
 uint8_t cursor_pg = 0;
 uint8_t cursor_col = 0;
 
