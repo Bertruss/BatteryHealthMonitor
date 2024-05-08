@@ -2,12 +2,11 @@
 #define TINY_ADC_H
 #include <stdint.h>
 // interface for ease of use of the ADC
-enum adc_mode{
-	WAKE = 0x00,
-	SLEEP = 0x01
-}adc_mode;
 
+extern uint8_t active_pin;
+extern enum adc_pin;
 void adc_init();
+void adc_pin_select(enum adc_pin input_pin);
 void adc_enable();
 void adc_pause();
 uint16_t adc_read(enum adc_mode mode);

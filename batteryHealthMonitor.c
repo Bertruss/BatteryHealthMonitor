@@ -11,6 +11,26 @@ ISR(TIMER0_COMPA){ // toggle off the interrupt
 	TIFR // clear the flag
 }
 
+/*
+Program cycle:
+**start**
+    [ADC low-power mode]
+        |
+        [measure voltage]
+        |
+        V
+    # ADC complete flag interrupt #
+    [calculate percentage]
+    [check for low batt]
+    [update screen]
+    [Deep Sleep]
+        |
+        |
+        V
+    # ~.5s timer interrupt #
+^loop
+*/
+
 int main(){
     cli();
     twi_init(); // Initialize i2c

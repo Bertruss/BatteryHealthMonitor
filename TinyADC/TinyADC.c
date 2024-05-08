@@ -2,10 +2,36 @@
 #include <util/delay.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-//ADC = Vin*1024/VREF
+
+uint8_t adc_activepin;
+
+enum adc_mode{
+	WAKE = 0x00,
+	SLEEP = 0x01
+}adc_mode;
+
+enum adc_pin{
+	ADC1_PB2 = 0x01,
+	ADC3_PB3 = 0x03,
+	ADC2_PB4 = 0x02,
+	ADC0_PB5 = 0x00
+	//ADC_REF = 0x0C
+}adc_pin;
 
 ISR(ADC_vect){
 	ADCSRA |= (1 << ADIF); // reset the conversion-finished flag
+}
+
+void adc_pin_select(enum adc_pin input_pin){
+    in_buffer_lut = {0x20, 0x04, 0x10, 0x08}; // LUT from admux val to data input buffer disable
+
+    // clear settings for prior adc input selected, mux enable and input buffer disable
+    ADMUX &= 0xF0;
+    DIDR0 &= !0x3C;
+
+    ADMUX |= input_pin;
+    DIDR0 |= in_buffer_lut[input_pin]; // disable the digital input buffer on the input pin
+    adc_activepin = input_pin;
 }
 
 void adc_init(){
@@ -14,16 +40,10 @@ void adc_init(){
     Vcc selected as VREF
     */
 
-   // TODO: consider making inputs more flexible
-    ADMUX = (1 << MUX1) | // select ADC3 
-            (1 << MUX0); 
-
     ADCSRA = (1 << ADEN) | // enable the ADC
             (1 << ADPS2) | // set the prescaler to 128. 8mhz/128 -> 62.5 khz
             (1 << ADPS1) |
             (1 << ADPS0);
-
-    DIDR0 |= (1 << ADC3D); // disable the digital input buffer on the input pin
 }
 
 void adc_enable(){ 
@@ -62,11 +82,11 @@ uint16_t adc_measure_ref(){
     // Check Vcc by measuring 1.1v internal voltage reference, with Vcc as VREF. 
     
     // Set the input as the 1.1 ref, referred to as Vbg or 'Bandgap Voltage'
-    ADMUX = (1 << MUX3) | // select ADC3 
-            (1 << MUX2); 
+    tmp_ADMUX = ADMUX;  // cache current setting 
+    ADMUX &= 0xF0;      // clear setting
+    ADMUX |= ADC_REF;   // set ADC reference
 
     // Note: VREF is still vcc, so the measured value of the 1.1 ref will inform on Vcc's deviation from 5v
-
     // After switching to internal voltage reference the ADC requires a settling time of 1ms before measurements are sta-
     // ble. Conversions starting before this may not be reliable. The ADC must be enabled during the settling time.
     _delay_ms(1);
@@ -75,8 +95,8 @@ uint16_t adc_measure_ref(){
     uint16_t result = adc_read(SLEEP);
     
     // reset input selection
-    ADMUX = (1 << MUX1) |  
-            (1 << MUX0);
-			
+    ADMUX &= 0xF0;
+    ADMUX = tmp_ADMUX;
+
     return result;
 }
