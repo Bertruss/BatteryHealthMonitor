@@ -19,7 +19,6 @@ enum adc_pin{
 }adc_pin;
 
 void adc_init();
-void adc_pin_select(enum adc_pin input_pin);
 void adc_enable();
 void adc_pause();
 uint16_t adc_read(enum adc_mode mode);

@@ -21,7 +21,7 @@ uint8_t initialization[] = {
 	0x80, 0x00, /* ^ start page 0 */
 	0x80, 0x07, /* ^ end page 7 */
 	0x80, 0x81, /* Set Brightness */
-	0x80, 0x1F	/* ^ brightness val */
+	0x80, 0x1F	/* ^ brightness val*/
 };
 
 uint8_t cursor_cmd[] = {
@@ -57,30 +57,27 @@ void SSD1306_reset_cursor(){
 
 void SSD1306_clear(){
 	//clears the whole screen
-	for(int i = 0; i < 8; i++){
-        SSD1306_clear_segment(i, 0, 127);
-    }
+	int i = 8;
+	do{
+		i--;
+	    SSD1306_clear_segment(i, 0, 127);
+    }while(i > 0);
+	 SSD1306_set_cursor(0, 0); // put the cursor at the upper right hand corner
 }
 
 void SSD1306_clear_segment(uint8_t pg, uint8_t start_col, uint8_t end_col){
 	//clears section of screen
 	SSD1306_set_cursor(pg, start_col);
-	twi_start();
-	twi_byte_transfer((SCREEN_ADDR << 1), false, WRITE);
     uint8_t len = end_col - start_col + 1;
-	if(twi_byte_transfer(0x00, true, READ) == 0x00){// read ack
-		twi_byte_transfer(0x40, false, WRITE);
-		twi_byte_transfer(0x00, true, READ); // read ack
-		for(int i = 0; i < len; i++){
-			twi_byte_transfer(0x00, false, WRITE);
-			twi_byte_transfer(0x00, true, READ); // read ack
-		}
-		twi_stop();
+	while(len > 0){
+		len--;
+		SSD1306_draw(0x00);
 	}
 	SSD1306_reset_cursor();
 }
 
 void SSD1306_draw(uint8_t byte){
+	// sends a byte with a draw command. Note, does not automatically increment the "cursor" var. 
 	uint8_t write_buff[2] = {0x40, byte};
 	twi_transmission (SCREEN_ADDR, write_buff, 2, WRITE);
 }
