@@ -22,5 +22,4 @@ void adc_init();
 void adc_enable();
 void adc_pause();
 uint16_t adc_read(enum adc_mode mode);
-uint16_t adc_measure_ref();
 #endif
