@@ -186,7 +186,7 @@ void display_voltage(uint32_t value){
 	write_char('V');
 }
 
-void test_fnct(uint16_t val, uint8_t position){
+void test_fnct16(uint16_t val, uint8_t position, uint8_t col){
 	// convert val to display voltage
 	// TODO: rework with some bitwise operations. this may take a lot of cycles
 	// determine expected voltage range (8 - 6.4 for 2 cell?)
@@ -205,7 +205,61 @@ void test_fnct(uint16_t val, uint8_t position){
 	// pull the .01's
 	uint8_t ones = val;
 	
-	SSD1306_set_cursor(position, 0);
+	SSD1306_set_cursor(position, col);
+	render_symbol(0x2d + thousand*5);
+	render_symbol(0x2d + hundred*5);
+	render_symbol(0x2d + tens*5);
+	render_symbol(0x2d + ones*5);
+}
+
+void test_fnct32(uint32_t val, uint8_t position, uint8_t col){
+	// convert val to display voltage
+	// TODO: rework with some bitwise operations. this may take a lot of cycles
+	// determine expected voltage range (8 - 6.4 for 2 cell?)
+	// max = 4,294,967,295
+	uint8_t billion = val/1000000000;
+	val = val % 1000000000;
+	
+	// pull the .1's place
+	uint8_t hundredmillion = val/100000000;
+	val = val % 100000000;
+
+	// pull the .1's place
+	uint8_t tenmillion = val/10000000;
+	val = val % 10000000;
+	
+	uint8_t million = val/1000000;
+	val = val % 1000000;
+	
+	// pull the .1's place
+	uint8_t hundredthousand = val/100000;
+	val = val % 100000;
+
+	// pull the .1's place
+	uint8_t tenthousand = val/10000;
+	val = val % 10000;
+
+	uint8_t thousand = val/1000;
+	val = val % 1000;
+	
+	// pull the .1's place
+	uint8_t hundred = val/100;
+	val = val % 100;
+
+	// pull the .1's place
+	uint8_t tens = val/10;
+	val = val % 10;
+
+	// pull the .01's
+	uint8_t ones = val;
+	
+	SSD1306_set_cursor(position, col);
+	render_symbol(0x2d + billion*5);
+	render_symbol(0x2d + hundredmillion*5);
+	render_symbol(0x2d + tenmillion*5);
+	render_symbol(0x2d + million*5);
+	render_symbol(0x2d + hundredthousand*5);
+	render_symbol(0x2d + tenthousand*5);
 	render_symbol(0x2d + thousand*5);
 	render_symbol(0x2d + hundred*5);
 	render_symbol(0x2d + tens*5);

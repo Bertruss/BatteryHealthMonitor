@@ -14,5 +14,6 @@ void display_voltage(uint32_t value);
 void clear_warning();
 void display_warning();
 void display_percent_charge(uint8_t val);
-void test_fnct(uint16_t val, uint8_t position);
+void test_fnct16(uint16_t val, uint8_t position, uint8_t col);
+void test_fnct32(uint32_t val, uint8_t position, uint8_t col);
 #endif
