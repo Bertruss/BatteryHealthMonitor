@@ -42,6 +42,15 @@ void twi_init(void){
             (1 << USIDC); //Clear Data Output Collision
 }
 
+
+void twi_disable(void){
+	USICR &= !(1 << USIWM1); // disable TWI
+}
+
+void twi_enable(void){
+	USICR |= (1 << USIWM1); // enable TWI
+}
+
 void twi_start(void){
     // outputs i2c start condition
     PORT_TWI &= ~(1 << SDA); // set SDA low
