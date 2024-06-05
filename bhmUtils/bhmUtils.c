@@ -1,6 +1,7 @@
 #include "bhmUtils.h"
 #include "ADCscale.h"
 #include "..\TinyADC\TinyADC.h"
+#include "..\TinyTWI\TinyTWI.h"
 #include "bhmDisplay.h"
 #include <stdint.h>
 #include <avr/io.h>
@@ -10,24 +11,46 @@
 // TODO: consider uint64_t, operations had to have their accuracy pre-halved to avoid overflows. (using 10^4 instead of 10^8)
 // though it should be noted, this does seem to give at least 2 decimal places free of quantization error.
 
+void bhm_init(){
+	DIDR0 |= (1 << ADC3D);
+}
+
+// Averaging?
+uint32_t last_measure = 0;
 uint32_t measure_battery_voltage(){
-    // measuring Vcc to apply Vref correction (should be ~5v but this step corrects for some innaccuracy)
-    uint16_t Vcc_ref = adc_measure_ref();
-	test_fnct(Vcc_ref, 0); // DEBUG
-	// NOTE: not sure there is a better way to do this to limit quantization error
-    uint32_t Vcc = 1.1*10000/Vcc_ref*1024; // measure Vcc, so error can be determined 
-   
-    // Apply error correction
-    // Note: quanta is just hard-coded 5/1024
-    // add vcc offset to get 
-	ADMUX &= 0x00;
-	ADMUX |= (1 << MUX1) | (1 << MUX0);
-	uint16_t batt_val = adc_read(WAKE);
-	test_fnct(batt_val, 2); // DEBUG
-	batt_val = adc_read(WAKE);
-	test_fnct(batt_val,6); // DEBUG
-    uint32_t val = (batt_val*qaunta)/10000*Vcc/5 + Vcc;
-    return val;
+    // UINT32_MAX = 4,294,967,295
+	// first measuring Vbg, to calculate vref and apply correction (should be ~5v but this step corrects for some inaccuracy)
+	adc_pin_select(ADC_REF);
+	_delay_ms(3);
+
+	// Note: VREF is still vcc, so the measured value of the 1.1 ref will inform on Vcc's deviation from 5v
+	// After switching to internal voltage reference the ADC requires a settling time of 1ms before measurements are stable.
+	// Conversions starting before this may not be reliable. The ADC must be enabled during the settling time.	
+	
+	uint32_t accum = 0; // accumulator for averaging
+	uint8_t reps = 100; 
+	uint8_t i = reps;
+	while(i){
+		accum += adc_read(SLEEP);
+		i--;
+	}
+	accum /= reps;
+	uint32_t Vcc = 1100000/(accum+1)*1024; // 1.1*10e7 measure Vcc, so error can be determined
+	
+	// measure test point
+	adc_pin_select(ADC3_PB3);
+	_delay_ms(1);
+	accum = 0; // accumulator for averaging
+	i = reps;
+	while(i){
+		accum += adc_read(SLEEP);
+		i--;
+	}
+	accum /= reps;
+	
+	// Apply error correction
+	uint32_t val = ((accum+1)*qaunta)/1000000*Vcc/5;
+	return val;
 }
 
 // TODO: placeholder linear approximation of charge from voltage. very innaccurate
