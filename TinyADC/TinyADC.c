@@ -7,7 +7,6 @@
 enum adc_pin selected_input;
 
 ISR(ADC_vect){
-	ADCSRA |= (1 << ADIF); // reset the conversion-finished flag
 }
 
 //TODO: this mostly seems unnecessary. disable digital input buffers.
@@ -39,7 +38,7 @@ void adc_enable(){
 }
 
 void adc_pause(){ 
-    ADCSRA &= !(1 << ADEN);
+    ADCSRA &= ~(1 << ADEN);
 }
 
 uint16_t adc_read(enum adc_mode mode){ 
@@ -52,14 +51,14 @@ uint16_t adc_read(enum adc_mode mode){
     }else{
 		// sleep cycle
 		cli();
-        set_sleep_mode(SLEEP_MODE_ADC);
+		set_sleep_mode(SLEEP_MODE_ADC);
 		sleep_enable();
-		ADCSRA |= (1 << ADSC) | (1 << ADIE);
 		sei();
+		ADCSRA |= (1 << ADSC) | (1 << ADIE);
 		sleep_cpu(); //start slept conversion
-		sleep_disable (); // wake
-		while((ADCSRA & (1 << ADSC)) == 1); 
-		sleep_disable (); // wake
+		sleep_disable (); //wake
+		while((ADCSRA & (1 << ADSC)) == 1);
+		ADCSRA &= ~(1 << ADIE);
 		cli();
     }
     // ensure interrupt flag is cleared

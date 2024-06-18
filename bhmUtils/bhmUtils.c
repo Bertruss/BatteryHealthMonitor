@@ -15,8 +15,6 @@ void bhm_init(){
 	DIDR0 |= (1 << ADC3D);
 }
 
-// Averaging?
-uint32_t last_measure = 0;
 uint32_t measure_battery_voltage(){
     // UINT32_MAX = 4,294,967,295
 	// first measuring Vbg, to calculate vref and apply correction (should be ~5v but this step corrects for some inaccuracy)

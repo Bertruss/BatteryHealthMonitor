@@ -35,18 +35,16 @@ Program cycle:
 */
 
 int main(){
-    //cli(); // global interrupt disable
+    cli(); // global interrupt disable
+	//low_speed();
     twi_init(); // Initialize i2c
     adc_init(); // Configure ADC
+	bhm_init(); // bhm specific configurations
     SSD1306_init(); // Setup the screen
 	SSD1306_clear(); // Clear the screen mem
-	set_sleep_mode(SLEEP_MODE_IDLE);
 	configure_WDT_interrupt(); // configure timer based interrupt to wake sleep
-	adc_pin_select(ADC3_PB3);
-	
+	sei();
 	while(1){
-        //sleep_cpu();
-		//Use the ADC noise canceler?
         uint32_t voltage = measure_battery_voltage();
         //uint8_t percent = battery_charge(voltage);
         //bool batt_warn = percent > 15 ? false : true; // below 15% trigger battery warning
@@ -59,31 +57,43 @@ int main(){
         // low power shut-off? X
         // low power beep? X
         // sleep for 500ms? update screen O
-		//update_display(100, false, voltage);
-		_delay_ms(100);
+		update_display(100, false, voltage);
+		sleep_pause();
 	}
 }
 
 void WDT_interrupt_enable(){
-	WDTCR |= (1 << WDIE); // enable the watchdog timer interrupt for sleep wake-up
-}
+	 // enable the watchdog timer interrupt for sleep wake-up
+	 WDTCR |= (1 << WDIE);
+}				
 
 void WDT_interrupt_disable(){
-	WDTCR &= !(1 << WDIE); // enable the watchdog timer interrupt for sleep wake-up
+	WDTCR &= ~(1 << WDIE); // enable the watchdog timer interrupt for sleep wake-up
 }
 
 void configure_WDT_interrupt(){
-	// consider configurable sleep cycle
-    // PRR |= () //consider further power reduction
-    WDTCR |= (1 << WDP1) | 
+	// TODO: consider configurable sleep cycle
+    // TODO: PRR |= () //consider further power reduction
+	// WDP3 WDP2 WDP1 WDP0
+    WDTCR |= (1 << WDP1) | // 2 seconds
 			(1 << WDP2);
-			
+}
+
+void low_speed(){
+	CLKPR = 0x80; // enable clk prescaler manipulation
+	//(1 << CLKPCE) & !(1 << CLKPS3) & !(1 << CLKPS2) & !(1 << CLKPS1) & !(1 << CLKPS0);
+	CLKPR |= (1 << CLKPS2); // | (1 << CLKPS0);
 }
 
 // triggers sleep mode with WDT triggered wake 
 void sleep_pause(){
-	sei();
+	cli();
 	WDT_interrupt_enable();
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	sei();
 	sleep_enable();
-	sleep_mode();
+	sleep_cpu(); //start slept conversion
+	sleep_disable(); // wake
+	WDT_interrupt_disable();
+	cli();
 }
