@@ -1,8 +1,8 @@
-#include "bhmUtils.h"
-#include "ADCscale.h"
-#include "..\TinyADC\TinyADC.h"
-#include "..\TinyTWI\TinyTWI.h"
-#include "bhmDisplay.h"
+#include "../include/bhmUtils.h"
+#include "../include/ADCscale.h"
+#include "../include/TinyADC.h"
+#include "../include/TinyTWI.h"
+#include "../include/bhmDisplay.h"
 #include <stdint.h>
 #include <avr/io.h>
 #include <util/delay.h>

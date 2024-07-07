@@ -1,5 +1,5 @@
 #include "SSD1306_driver.h"
-#include "../TinyTWI/TinyTWI.h"
+#include "../include/TinyTWI.h"
 
 /* 
  * 128x32 oled screen driver 

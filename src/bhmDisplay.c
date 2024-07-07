@@ -1,9 +1,9 @@
-#include "bhmDisplay.h"
-#include "../SSD1306_driver/SSD1306_driver.h"
-#include "../font/fnt.h"
-#include "../TinyTWI/TinyTWI.h"
-#include "../TinyEeprom/TinyEeprom.h"
-#include "../bhmUtils/ADCscale.h"
+#include "../include/bhmDisplay.h"
+#include "../include/SSD1306_driver.h"
+#include "../include/fnt.h"
+#include "../include/TinyTWI.h"
+#include "../include/TinyEeprom.h"
+#include "../include/ADCscale.h"
 
 // bhmDisplay is a collection of graphics drawing functions specific to the battery health monitor use case.
 

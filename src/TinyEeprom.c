@@ -1,4 +1,4 @@
-#include "TinyEeprom.h"
+#include "../include/TinyEeprom.h"
 #include <avr/io.h>
 
 void eeprom_read(uint8_t *read_buff, uint8_t start_addr, uint8_t length){
