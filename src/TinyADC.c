@@ -1,4 +1,4 @@
-#include "TinyADC.h"
+#include "../include/TinyADC.h"
 #include <util/delay.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>

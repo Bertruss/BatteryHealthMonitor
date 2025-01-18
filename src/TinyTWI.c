@@ -1,5 +1,5 @@
-#include "TinyTWI.h"
-#include "fcpu.h"
+#include "../include/TinyTWI.h"
+#include "../include/fcpu.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <util/delay.h>

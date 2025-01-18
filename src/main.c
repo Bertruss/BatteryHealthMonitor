@@ -1,9 +1,9 @@
-#include "./TinyTWI/fcpu.h"
-#include "./TinyTWI/TinyTWI.h"
-#include "./TinyADC/TinyADC.h"
-#include "./bhmUtils/bhmDisplay.h"
-#include "./bhmUtils/bhmUtils.h"
-#include "./SSD1306_driver/SSD1306_driver.h"
+#include "../include/fcpu.h"
+#include "../include/TinyTWI.h"
+#include "../include/TinyADC.h"
+#include "../include/bhmDisplay.h"
+#include "../include/bhmUtils.h"
+#include "../include/SSD1306_driver.h"
 #include <stdbool.h>
 #include <avr/io.h>
 #include <avr/sleep.h>
