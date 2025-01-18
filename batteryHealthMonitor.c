@@ -35,6 +35,7 @@ Program cycle:
 */
 
 int main(){
+	
     cli(); // global interrupt disable
 	//low_speed();
     twi_init(); // Initialize i2c
@@ -46,8 +47,8 @@ int main(){
 	sei();
 	while(1){
         uint32_t voltage = measure_battery_voltage();
-        //uint8_t percent = battery_charge(voltage);
-        //bool batt_warn = percent > 15 ? false : true; // below 15% trigger battery warning
+        uint8_t percent = battery_charge(voltage);
+        bool batt_warn = percent > 15 ? false : true; // below 15% trigger battery warning
 		//calculate battery percentage estimate
         //calculate time-to-empty
         //update screen
@@ -57,7 +58,7 @@ int main(){
         // low power shut-off? X
         // low power beep? X
         // sleep for 500ms? update screen O
-		update_display(100, false, voltage);
+		update_display(percent, batt_warn, voltage);
 		sleep_pause();
 	}
 }
