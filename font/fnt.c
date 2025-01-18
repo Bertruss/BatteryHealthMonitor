@@ -1,4 +1,4 @@
-#include "fnt.h"
+#include "../include/fnt.h"
 #include <stdint.h>
 
 uint8_t char_width = 5;
