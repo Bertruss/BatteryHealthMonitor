@@ -4,4 +4,5 @@
 extern uint32_t maxV;
 extern uint32_t minV;
 extern uint32_t qaunta;
+extern uint32_t Ah;
 #endif
