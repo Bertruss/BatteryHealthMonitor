@@ -3,7 +3,7 @@
 #include "../include/fnt.h"
 #include "../include/TinyTWI.h"
 #include "../include/TinyEeprom.h"
-#include "../include/ADCscale.h"
+#include "../include/bhmADC.h"
 
 // bhmDisplay is a collection of graphics drawing functions specific to the battery health monitor use case.
 
@@ -11,7 +11,7 @@
 // height = 4;
 /*
 |	Z |~~~~~~~~~~~~~~~~~| 100%
-|	VOLTAGE :  	
+|	V :  	A : 
 |	EST. TIME : ____  	
 | 			[warning]
 */
@@ -26,14 +26,15 @@ uint8_t graphics[16] = {
 	0x00, 0x41	// end - lightning bolt
 };
 
-char charge_txt[6] = {'C', 'H', 'A', 'R', 'G', 'E'};
 char time_txt[9] = {'E', 'S', 'T', '.', ' ', 'T', 'I', 'M', 'E'}; // might be too ambitious
-char warning_txt[24] = {'B', 'A', 'T', 'T', 'E', 'R', 'Y', ' ', 'L','E','V','E','L',' ','C','R','I','T','I','C','A','L'};
-char voltage_txt[13] = {'C','E','L','L',' ','V','O','L','T','A','G','E', ':'};
+char warning_txt[25] = {'B', 'A', 'T', 'T', 'E', 'R', 'Y', ' ', 'L','E','V','E','L',' ','C','R','I','T','I','C','A','L', 0};
+char voltage_txt[9] = {'V', 'O', 'L', 'T', 'A', 'G', 'E', ':', 0};
+char current_txt[9] = {'C', 'U', 'R', 'R', 'E', 'N','T', ':', 0};
 
-void update_display(uint8_t percent, bool warn, uint32_t voltage){
+void update_display(uint8_t percent, bool warn, uint32_t voltage, uint32_t current){
 	draw_percent_bar(percent);
 	display_voltage(voltage);
+	display_current(current);
 	// draw time estimate?
 	if(warn){
 		display_warning();
@@ -159,109 +160,49 @@ void display_percent_charge(uint8_t value){
 	write_char('%');
 }
 
-void display_voltage(uint32_t value){
-	// convert val to display voltage
-	// TODO: rework with some bitwise operations. this may take a lot of cycles
-	// determine expected voltage range (8 - 6.4 for 2 cell?)
+void display_3digit(uint32_t value, char unit){
+	// pull 3 sig figs, display with decimal point and unit
 	
-	uint8_t v = value/100000000;
-	value = value % 100000000;
+	uint8_t buff[3] = {0x00, 0x00, 0x00};
 	
-	// pull the .1's place
-	uint8_t cv = value/10000000;
-	value = value % 10000000;
+	//1's place
+	buff[0] = value/fixed_point_1e8;
+	value = value % fixed_point_1e8;
+	
+	//.1's place
+	buff[1] = value/(fixed_point_1e8/10);
+	value = value % (fixed_point_1e8/10);
 
 	// pull the .01's
-	uint8_t mv = value/1000000;
-  
-	SSD1306_set_cursor(2, 0);
-
-	for(int i = 0; i < 13; i++){
-		write_char(voltage_txt[i]);
-	}
-	render_symbol(0x2d + v*5);
+	buff[2] = value/(fixed_point_1e8/100);
+	
+	render_symbol(num_offset + buff[0]*5);
 	write_char('.');
-	render_symbol(0x2d + cv*5);
-	render_symbol(0x2d + mv*5);
-	write_char('V');
+	render_symbol(num_offset + buff[1]*5);
+	render_symbol(num_offset + buff[2]*5);
+	write_char(unit);
 }
 
-void test_fnct16(uint16_t val, uint8_t position, uint8_t col){
-	// convert val to display voltage
-	// TODO: rework with some bitwise operations. this may take a lot of cycles
-	// determine expected voltage range (8 - 6.4 for 2 cell?)
+void display_voltage(uint32_t value){
+	// Put voltage to display
 	
-	uint8_t thousand = val/1000;
-	val = val % 1000;
-	
-	// pull the .1's place
-	uint8_t hundred = val/100;
-	val = val % 100;
-
-	// pull the .1's place
-	uint8_t tens = val/10;
-	val = val % 10;
-
-	// pull the .01's
-	uint8_t ones = val;
-	
-	SSD1306_set_cursor(position, col);
-	render_symbol(0x2d + thousand*5);
-	render_symbol(0x2d + hundred*5);
-	render_symbol(0x2d + tens*5);
-	render_symbol(0x2d + ones*5);
+	SSD1306_set_cursor(2, 0);
+	char* ptr = &voltage_txt;
+	do{
+		write_char(*ptr);
+	}while(*(++ptr) != 0);
+	display_3digit(value, 'V');
 }
 
-void test_fnct32(uint32_t val, uint8_t position, uint8_t col){
-	// convert val to display voltage
-	// TODO: rework with some bitwise operations. this may take a lot of cycles
-	// determine expected voltage range (8 - 6.4 for 2 cell?)
-	// max = 4,294,967,295
-	uint8_t billion = val/1000000000;
-	val = val % 1000000000;
+void display_current(uint32_t value){
+	//  display amperage
 	
-	// pull the .1's place
-	uint8_t hundredmillion = val/100000000;
-	val = val % 100000000;
-
-	// pull the .1's place
-	uint8_t tenmillion = val/10000000;
-	val = val % 10000000;
+	SSD1306_set_cursor(4, 0);
+	char* ptr = &current_txt;
+	do{
+		write_char(*ptr);
+	}while(*(++ptr) != 0);
 	
-	uint8_t million = val/1000000;
-	val = val % 1000000;
-	
-	// pull the .1's place
-	uint8_t hundredthousand = val/100000;
-	val = val % 100000;
-
-	// pull the .1's place
-	uint8_t tenthousand = val/10000;
-	val = val % 10000;
-
-	uint8_t thousand = val/1000;
-	val = val % 1000;
-	
-	// pull the .1's place
-	uint8_t hundred = val/100;
-	val = val % 100;
-
-	// pull the .1's place
-	uint8_t tens = val/10;
-	val = val % 10;
-
-	// pull the .01's
-	uint8_t ones = val;
-	
-	SSD1306_set_cursor(position, col);
-	render_symbol(0x2d + billion*5);
-	render_symbol(0x2d + hundredmillion*5);
-	render_symbol(0x2d + tenmillion*5);
-	render_symbol(0x2d + million*5);
-	render_symbol(0x2d + hundredthousand*5);
-	render_symbol(0x2d + tenthousand*5);
-	render_symbol(0x2d + thousand*5);
-	render_symbol(0x2d + hundred*5);
-	render_symbol(0x2d + tens*5);
-	render_symbol(0x2d + ones*5);
+	display_3digit(value, 'A');
 }
+
