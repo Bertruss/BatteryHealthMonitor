@@ -31,6 +31,7 @@ void adc_init(){
             (1 << ADPS1) |
             (1 << ADPS0);
 	ADCSRA |= (1 << ADIF);
+	DDRB |= 0x00; // set all adc pins to input
 }
 
 void adc_enable(){ 
