@@ -6,5 +6,5 @@
 extern uint32_t qaunta;
 extern uint64_t Ah;
 extern uint16_t cellV_LUT[18];
-
+extern uint32_t amp_per_v;
 #endif
