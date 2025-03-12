@@ -74,7 +74,7 @@ uint32_t measure_current_draw(){
 	accum /= reps;
 	
 	// Apply error correction
-	uint32_t val = ((accum+1)*qaunta)/1000000*Vcc/5;
+	uint32_t val = (((accum+1)*qaunta)/1000000*Vcc/5)*amp_per_v ; // 11 is the gain of the op amp
 	return val;
 }
 
