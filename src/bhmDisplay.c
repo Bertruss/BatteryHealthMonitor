@@ -113,7 +113,7 @@ void draw_percent_bar(uint8_t percent){
 	draw_graphic(0);
 	draw_graphic(2);
 	int i = 0;
-	for(; i < 96; i++){
+	for(; i < 95; i++){
 		if(i < percent - 5){
 			draw_graphic(4);
 		}else{
@@ -142,44 +142,50 @@ void display_warning(){
 
 void display_percent_charge(uint8_t value){
 	// writes out battery percentage estimate
-	uint8_t numstart = 0x2d;
+	value = (value > 100)? 100 : value;
 	uint8_t temp = 0;
 	// ascii numbers start with address 0x2D in the font
-	if(value == 0x64){
-		render_symbol(numstart + 6);
+	if(value == 100){
+		render_symbol(num_offset + 6);
 		SSD1306_set_cursor(cursor_pg, cursor_col-2); //adjusting weird kerning
-		render_symbol(numstart);
-		render_symbol(numstart);
+		render_symbol(num_offset);
+		render_symbol(num_offset);
 	}else{
 		temp = value/10;
-		render_symbol(temp*5 + numstart);
+		render_symbol(temp*5 + num_offset);
 		
 		value = value % 10;
-		render_symbol(value*5 + numstart);
+		render_symbol(value*5 + num_offset);
 	}
 	write_char('%');
 }
 
-void display_3digit(uint32_t value, char unit){
+void display_4digit(uint32_t value, char unit){
 	// pull 3 sig figs, display with decimal point and unit
 	
-	uint8_t buff[3] = {0x00, 0x00, 0x00};
+	uint8_t buff[4] = {0x00, 0x00, 0x00, 0x00};
+	
+	//10's place
+	buff[0] = value/(fixed_point_1e8*10);
+	value = value % fixed_point_1e8;
 	
 	//1's place
-	buff[0] = value/fixed_point_1e8;
+	buff[1] = value/fixed_point_1e8;
 	value = value % fixed_point_1e8;
 	
 	//.1's place
-	buff[1] = value/(fixed_point_1e8/10);
+	buff[2] = value/(fixed_point_1e8/10);
 	value = value % (fixed_point_1e8/10);
 
 	// pull the .01's
-	buff[2] = value/(fixed_point_1e8/100);
+	buff[3] = value/(fixed_point_1e8/100);
 	
-	render_symbol(num_offset + buff[0]*5);
-	write_char('.');
+	if(!buff) // 10's place is optional
+		render_symbol(num_offset + buff[0]*5);
 	render_symbol(num_offset + buff[1]*5);
+	write_char('.');
 	render_symbol(num_offset + buff[2]*5);
+	render_symbol(num_offset + buff[3]*5);
 	write_char(unit);
 }
 

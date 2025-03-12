@@ -12,7 +12,7 @@ void render_symbol(uint8_t address);
 void clear_warning();
 void display_warning();
 void display_percent_charge(uint8_t val);
-void display_3digit(uint32_t value, char unit);
+void display_4digit(uint32_t value, char unit);
 void display_voltage(uint32_t value);
 void display_current(uint32_t value);
 #endif
