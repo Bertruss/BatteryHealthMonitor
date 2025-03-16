@@ -8,34 +8,14 @@
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <util/delay.h>
+#include "../include/bhmADC.h"
 
 ISR(WDT_vect){ // toggle off the interrupt
 	// watchdog timer interrupt disables automatically
     // sleep is disabled on wake via watchdog
 }
 
-/*
-Program cycle:
-**start**
-    [ADC low-power mode]
-        |
-        [measure voltage]
-        |
-        V
-    # ADC complete flag interrupt #
-    [calculate percentage]
-    [check for low batt]
-    [update screen]
-    [Deep Sleep]
-        |
-        |
-        V
-    # ~1s timer interrupt #
-^loop
-*/
-
 int main(){
-	
     cli(); // global interrupt disable
 	//low_speed();
     twi_init(); // Initialize i2c
@@ -45,9 +25,15 @@ int main(){
 	SSD1306_clear(); // Clear the screen mem
 	configure_WDT_interrupt(); // configure timer based interrupt to wake sleep
 	sei();
+	
+	// Battery charge estimation 
+	uint64_t total_charge_estimate = Ah; // assumption on bootup is that we start from full charge
+	
 	while(1){
         uint32_t voltage = measure_battery_voltage();
-        uint8_t percent = battery_charge(voltage);
+		uint32_t current = measure_current_draw();
+        uint8_t percent = basic_charge_estimate(voltage);
+		//uint8_t percent = adv_charge_estimate(voltage, current, &total_charge_estimate);
         bool batt_warn = percent > 15 ? false : true; // below 15% trigger battery warning
 		//calculate battery percentage estimate
         //calculate time-to-empty
@@ -58,8 +44,8 @@ int main(){
         // low power shut-off? X
         // low power beep? X
         // sleep for 500ms? update screen O
-		update_display(percent, batt_warn, voltage);
-		sleep_pause();
+		update_display(percent, batt_warn, voltage, current);
+		//sleep_pause(); // 2s sleep pause
 	}
 }
 

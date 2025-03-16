@@ -10,7 +10,7 @@ enum adc_mode{
 	SLEEP = 0x01
 }adc_mode;
 
-enum adc_pin{
+extern enum adc_pin{
 	ADC1_PB2 = 0x01,
 	ADC3_PB3 = 0x03,
 	ADC2_PB4 = 0x02,

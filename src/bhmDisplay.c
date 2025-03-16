@@ -161,27 +161,28 @@ void display_percent_charge(uint8_t value){
 }
 
 void display_4digit(uint32_t value, char unit){
-	// pull 3 sig figs, display with decimal point and unit
+	// pull up to 4 sig figs, display with decimal point and unit
 	
 	uint8_t buff[4] = {0x00, 0x00, 0x00, 0x00};
 	
 	//10's place
-	buff[0] = value/(fixed_point_1e8*10);
-	value = value % fixed_point_1e8;
+	buff[0] = value/(fixed_point*10);
+	value = value % (fixed_point*10);
 	
 	//1's place
-	buff[1] = value/fixed_point_1e8;
-	value = value % fixed_point_1e8;
+	buff[1] = value/fixed_point;
+	value = value % fixed_point;
 	
 	//.1's place
-	buff[2] = value/(fixed_point_1e8/10);
-	value = value % (fixed_point_1e8/10);
+	buff[2] = value/(fixed_point/10);
+	value = value % (fixed_point/10);
 
 	// pull the .01's
-	buff[3] = value/(fixed_point_1e8/100);
+	buff[3] = value/(fixed_point/100);
 	
-	if(!buff) // 10's place is optional
+	if(buff[0] != 0x00){ // 10's place is optional
 		render_symbol(num_offset + buff[0]*5);
+	}
 	render_symbol(num_offset + buff[1]*5);
 	write_char('.');
 	render_symbol(num_offset + buff[2]*5);
@@ -197,7 +198,7 @@ void display_voltage(uint32_t value){
 	do{
 		write_char(*ptr);
 	}while(*(++ptr) != 0);
-	display_3digit(value, 'V');
+	display_4digit(value, 'V');
 }
 
 void display_current(uint32_t value){
@@ -209,6 +210,6 @@ void display_current(uint32_t value){
 		write_char(*ptr);
 	}while(*(++ptr) != 0);
 	
-	display_3digit(value, 'A');
+	display_4digit(value, 'A');
 }
 
