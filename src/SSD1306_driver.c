@@ -76,6 +76,16 @@ void SSD1306_clear_segment(uint8_t pg, uint8_t start_col, uint8_t end_col){
 	SSD1306_reset_cursor();
 }
 
+void SSD1306_delete(){
+	//clears current cursor position
+	uint8_t len = 5;
+	while(len > 0){
+		len--;
+		SSD1306_draw(0x00);
+	}
+	SSD1306_reset_cursor();
+}
+
 void SSD1306_draw(uint8_t byte){
 	// sends a byte with a draw command. Note, does not automatically increment the "cursor" var. 
 	uint8_t write_buff[2] = {0x40, byte};
