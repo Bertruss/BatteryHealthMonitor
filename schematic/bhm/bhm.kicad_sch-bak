@@ -6,7 +6,7 @@
 	(paper "A4")
 	(title_block
 		(title "Attiny Battery Voltage Monitor")
-		(comment 1 "1-2C 3.2-8.4V ~40A MAX ")
+		(comment 1 "1-2C 3.2-8.4V 40A MAX ")
 	)
 	(lib_symbols
 		(symbol "Amplifier_Operational:LM358"
@@ -2653,7 +2653,7 @@
 				)
 			)
 		)
-		(property "Value" "220k"
+		(property "Value" "2M"
 			(at 156.21 107.95 90)
 			(effects
 				(font
@@ -2864,7 +2864,7 @@
 				)
 			)
 		)
-		(property "Value" "22k"
+		(property "Value" "200k"
 			(at 170.18 115.57 90)
 			(effects
 				(font
