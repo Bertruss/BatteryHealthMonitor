@@ -25,16 +25,17 @@ int main(){
 	SSD1306_clear(); // Clear the screen mem
 	configure_WDT_interrupt(); // configure timer based interrupt to wake sleep
 	sei();
-	
+	bool test = 1;
 	// Battery charge estimation 
 	uint64_t total_charge_estimate = Ah; // assumption on bootup is that we start from full charge
 	
 	while(1){
+		//test = !test; 
         uint32_t voltage = measure_battery_voltage();
-		uint32_t current = measure_current_draw();
+        uint32_t current = measure_current_draw();
         uint8_t percent = basic_charge_estimate(voltage);
 		//uint8_t percent = adv_charge_estimate(voltage, current, &total_charge_estimate);
-        bool batt_warn = percent > 15 ? false : true; // below 15% trigger battery warning
+		bool batt_warn = percent > 15 ? false : true; // below 15% trigger battery warning
 		//calculate battery percentage estimate
         //calculate time-to-empty
         //update screen
@@ -45,7 +46,9 @@ int main(){
         // low power beep? X
         // sleep for 500ms? update screen O
 		update_display(percent, batt_warn, voltage, current);
-		//sleep_pause(); // 2s sleep pause
+		sleep_pause(); // 1s sleep pause
+		_delay_ms(80);// acounting for other timing overhead, to reach 1.5s 
+		
 	}
 }
 
@@ -62,8 +65,7 @@ void configure_WDT_interrupt(){
 	// TODO: consider configurable sleep cycle
     // TODO: PRR |= () //consider further power reduction
 	// WDP3 WDP2 WDP1 WDP0
-    WDTCR |= (1 << WDP1) | // 2 seconds
-			(1 << WDP2);
+    WDTCR |= (1 << WDP2) | (1 << WDP1); //1 sec
 }
 
 void low_speed(){
