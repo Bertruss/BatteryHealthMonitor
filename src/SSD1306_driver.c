@@ -45,13 +45,19 @@ void SSD1306_set_cursor(uint8_t page, uint8_t col){
 	// col must be less than 128
 	cursor_pg = page;
 	cursor_col = col;
-	cursor_cmd[1] = 0xb0 | page;
-	cursor_cmd[3] = 0x00 | (col & 0x0f);
-	cursor_cmd[5] = 0x10 | ((col >> 4) & 0x0f);
+	SSD1306_reset_cursor();
+}
+
+void SSD1306_offset_cursor(int8_t page_offset, int8_t col_offset){
+	cursor_pg += page_offset;
+	cursor_col += col_offset;
 	SSD1306_reset_cursor();
 }
 
 void SSD1306_reset_cursor(){
+	cursor_cmd[1] = 0xb0 | cursor_pg;
+	cursor_cmd[3] = 0x00 | (cursor_col & 0x0f);
+	cursor_cmd[5] = 0x10 | ((cursor_col >> 4) & 0x0f);
 	twi_transmission (SCREEN_ADDR, cursor_cmd, 6, WRITE);
 }
 
@@ -69,16 +75,6 @@ void SSD1306_clear_segment(uint8_t pg, uint8_t start_col, uint8_t end_col){
 	//clears section of screen
 	SSD1306_set_cursor(pg, start_col);
     uint8_t len = end_col - start_col + 1;
-	while(len > 0){
-		len--;
-		SSD1306_draw(0x00);
-	}
-	SSD1306_reset_cursor();
-}
-
-void SSD1306_delete(){
-	//clears current cursor position
-	uint8_t len = 5;
 	while(len > 0){
 		len--;
 		SSD1306_draw(0x00);

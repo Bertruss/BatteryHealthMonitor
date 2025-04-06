@@ -16,7 +16,7 @@
 | 			[warning]
 */
 
-uint8_t graphics[16] = {
+const uint8_t graphics[16] = {
 	0xff, 0xff,  // endcap
 	0x01, 0x40,  // empty ind
 	0xf1, 0x4f,  // full ind
@@ -199,6 +199,7 @@ void display_voltage(uint32_t value){
 		write_char(*ptr);
 	}while(*(++ptr) != 0);
 	display_4digit(value, 'V');
+	display_delete();
 }
 
 void display_current(uint32_t value){
@@ -211,5 +212,21 @@ void display_current(uint32_t value){
 	}while(*(++ptr) != 0);
 	
 	display_4digit(value, 'A');
+	display_delete();
 }
 
+void display_delete(){
+	//clears current cursor position
+	uint8_t len = 5;
+	while(len > 0){
+		len--;
+		SSD1306_draw(0x00);
+	}
+	SSD1306_offset_cursor(1, 0); //shift down to bottom half of the cursor segment for this font
+	len = 5;
+	while(len > 0){
+		len--;
+		SSD1306_draw(0x00);
+	}
+	SSD1306_reset_cursor();
+}
