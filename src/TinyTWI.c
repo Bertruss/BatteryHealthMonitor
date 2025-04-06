@@ -26,7 +26,7 @@ void twi_init(void){
             (1 << USICS1)| //set "external, pos-edge" clock source
             (1 << USICLK); //and set the 4-bit counter clk to software gen, via the (USITC) register
     // NOTE: for the sake of the 4-bit counter, this is an "external clock", 
-    // so the counter is triggered on both edges. Hence a 4-bit (0-15 value) counter to count
+    // the counter is triggered on both edges. Hence a 4-bit (0-15 value) counter to count
     // shifting in and out an 8-bit value. The counter rolls over to 16 and triggers the overflow flag, 
     // which you can check to see if a full byte has been r/w
 
