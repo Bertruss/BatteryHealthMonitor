@@ -51,16 +51,14 @@ uint16_t adc_read(enum adc_mode mode){
 		while((ADCSRA & (1 << ADIF)) == 0); // wait for the conversion to complete, just to be sure
     }else{
 		// sleep cycle
-		cli();
+		sei();
 		set_sleep_mode(SLEEP_MODE_ADC);
 		sleep_enable();
-		sei();
 		ADCSRA |= (1 << ADSC) | (1 << ADIE);
 		sleep_cpu(); //start slept conversion
 		sleep_disable (); //wake
 		while((ADCSRA & (1 << ADSC)) == 1);
 		ADCSRA &= ~(1 << ADIE);
-		cli();
     }
     // ensure interrupt flag is cleared
 	ADCSRA |= (1 << ADIF);
