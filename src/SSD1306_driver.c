@@ -8,7 +8,7 @@
 uint8_t cursor_pg = 0;
 uint8_t cursor_col = 0;
 
-uint8_t initialization[] = {
+uint8_t initialization[26] = {
 	0x80, 0x8d, /* Enable charge pump regulator (RESET = ) */
 	0x80, 0x14, /* ^ */
 	0x80, 0xaf, /* Display On (RESET = ) */
@@ -24,13 +24,13 @@ uint8_t initialization[] = {
 	0x80, 0x1F	/* ^ brightness val*/
 };
 
-uint8_t cursor_cmd[] = {
+uint8_t cursor_cmd[6] = {
 	0x80, 0xb0,  // page start address: 0xb0 | (y >> 3)
 	0x80, 0x00,  // lower nibble of column: 0x00 | (x & 0x0f)
 	0x80, 0x10,  // upper nibble of column: 0x10 | ((x >> 4) & 0x0f)
 };
 
-uint8_t brightness_cmd[] = {
+uint8_t brightness_cmd[4] = {
 	0x80, 0x81, // Brightness cmd
 	0x80, 0x00 // value
 };
