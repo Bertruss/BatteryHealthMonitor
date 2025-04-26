@@ -13,7 +13,7 @@ void clear_warning();
 void display_warning();
 void display_percent_charge(uint8_t val);
 void display_4digit(uint32_t value, char unit);
-void display_voltage(uint32_t value);
-void display_current(uint32_t value);
+void display_metric(uint32_t value, char* label, uint8_t line, char unit);
+void display_test_8digit(uint32_t value);
 void display_delete();
 #endif

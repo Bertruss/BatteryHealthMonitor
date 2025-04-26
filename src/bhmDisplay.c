@@ -4,6 +4,7 @@
 #include "../include/TinyTWI.h"
 #include "../include/TinyEeprom.h"
 #include "../include/bhmADC.h"
+#include "../include/TinyMath.h"
 
 // bhmDisplay is a collection of graphics drawing functions specific to the battery health monitor use case.
 
@@ -26,15 +27,15 @@ const uint8_t graphics[16] = {
 	0x00, 0x41	// end - lightning bolt
 };
 
-char time_txt[9] = {'E', 'S', 'T', '.', ' ', 'T', 'I', 'M', 'E'}; // might be too ambitious
+char time_txt[11] = {'E', 'S', 'T', '.', ' ', 'T', 'I', 'M', 'E', ':', 0}; // might be too ambitious
 char warning_txt[25] = {'B', 'A', 'T', 'T', 'E', 'R', 'Y', ' ', 'L','E','V','E','L',' ','C','R','I','T','I','C','A','L', 0};
 char voltage_txt[9] = {'V', 'O', 'L', 'T', 'A', 'G', 'E', ':', 0};
 char current_txt[9] = {'C', 'U', 'R', 'R', 'E', 'N','T', ':', 0};
 
 void update_display(uint8_t percent, bool warn, uint32_t voltage, uint32_t current){
 	draw_percent_bar(percent);
-	display_voltage(voltage);
-	display_current(current);
+	display_metric(voltage, voltage_txt, 2, 'V');
+	display_metric(current, current_txt, 4, 'A');
 	// draw time estimate?
 	if(warn){
 		display_warning();
@@ -113,13 +114,14 @@ void draw_percent_bar(uint8_t percent){
 	draw_graphic(0);
 	draw_graphic(2);
 	int i = 0;
-	for(; i < 95; i++){
+	for(; i < 94; i++){
 		if(i < percent - 5){
 			draw_graphic(4);
 		}else{
 			draw_graphic(2);
 		}
 	}
+	draw_graphic(2);
 	//draw the endcap
 	draw_graphic(0);
 	
@@ -190,28 +192,15 @@ void display_4digit(uint32_t value, char unit){
 	write_char(unit);
 }
 
-void display_voltage(uint32_t value){
+void display_metric(uint32_t value, char* label, uint8_t line, char unit){
 	// Put voltage to display
 	
-	SSD1306_set_cursor(2, 0);
-	char* ptr = &voltage_txt;
+	SSD1306_set_cursor(line, 0);
+	char* ptr = label;
 	do{
 		write_char(*ptr);
 	}while(*(++ptr) != 0);
-	display_4digit(value, 'V');
-	display_delete();
-}
-
-void display_current(uint32_t value){
-	//  display amperage
-	
-	SSD1306_set_cursor(4, 0);
-	char* ptr = &current_txt;
-	do{
-		write_char(*ptr);
-	}while(*(++ptr) != 0);
-	
-	display_4digit(value, 'A');
+	display_4digit(value, unit);
 	display_delete();
 }
 
@@ -229,4 +218,48 @@ void display_delete(){
 		SSD1306_draw(0x00);
 	}
 	SSD1306_reset_cursor();
+}
+
+void display_test_8digit(uint32_t value){
+	uint8_t buff[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	
+	
+	
+	buff[0] = value/(100000);
+	value = value % (100000);
+	
+	buff[1] = value/(10000);
+	value = value % (10000);
+	
+	buff[2] = value/(1000);
+	value = value % (1000);
+	
+	buff[3] = value/(100);
+	value = value % (100);
+	
+	buff[4] = value/(10);
+	value = value % (10);
+	
+	buff[5] = value;
+	
+	render_symbol(num_offset + buff[0]*5);
+	render_symbol(num_offset + buff[1]*5);
+	render_symbol(num_offset + buff[2]*5);
+	render_symbol(num_offset + buff[3]*5);
+	render_symbol(num_offset + buff[4]*5);
+	render_symbol(num_offset + buff[5]*5);
+	/*
+	// pull up to 7 sig figs, display with decimal point and unit
+	
+	uint8_t buff[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	
+	for(uint8_t i = 8; i > 0; i--){
+		buff[i] = value/(power_simple((uint32_t)10, i));
+		value = value % (10*i);
+	}
+	
+	for(int i = 8; i > 0; i--){
+		render_symbol(num_offset + buff[i]*5);
+	}
+	*/
 }
