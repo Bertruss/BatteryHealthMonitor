@@ -11,3 +11,9 @@ avrdude -c usbtiny -p t45 -U hfuse:w:0xE2:m
 ```
 - The font data was intended to be written to eeprom on the chip to save flash, 
 not knowing what the total compiled footprint of the code would be beforehand, I assumed I would need to be covetous of the limited 4k flash, and yet as development went on that seemed less and less necessary ¯\\_(ツ)_/¯. 
+
+I used Microchip Studio for a lot of this development. If you want to not clear the eeprom every time you reflash the program storage, set the eeprom protect bit:
+
+```
+avrdude -c usbtiny -p t45 -U hfuse:w:0xD7:m
+```
