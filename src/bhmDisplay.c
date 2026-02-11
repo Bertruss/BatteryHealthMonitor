@@ -221,26 +221,32 @@ void display_delete(){
 }
 
 void display_test_8digit(uint32_t value){
-	uint8_t buff[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	
+	SSD1306_set_cursor(6, 0);
+	uint8_t buff[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	
-	
-	buff[0] = value/(100000);
+	buff[0] = value/(10000000);
 	value = value % (100000);
 	
-	buff[1] = value/(10000);
+	buff[1] = value/(1000000);
+	value = value % (1000000);
+	
+	buff[2] = value/(100000);
+	value = value % (100000);
+	
+	buff[3] = value/(10000);
 	value = value % (10000);
 	
-	buff[2] = value/(1000);
+	buff[4] = value/(1000);
 	value = value % (1000);
 	
-	buff[3] = value/(100);
+	buff[5] = value/(100);
 	value = value % (100);
 	
-	buff[4] = value/(10);
+	buff[6] = value/(10);
 	value = value % (10);
 	
-	buff[5] = value;
+	buff[7] = value;
 	
 	render_symbol(num_offset + buff[0]*5);
 	render_symbol(num_offset + buff[1]*5);
@@ -248,6 +254,8 @@ void display_test_8digit(uint32_t value){
 	render_symbol(num_offset + buff[3]*5);
 	render_symbol(num_offset + buff[4]*5);
 	render_symbol(num_offset + buff[5]*5);
+	render_symbol(num_offset + buff[6]*5);
+	render_symbol(num_offset + buff[7]*5);
 	/*
 	// pull up to 7 sig figs, display with decimal point and unit
 	
