@@ -2,6 +2,9 @@
 #include "../include/bhmADC.h"
 #include "../include/TinyMath.h"
 #include <inttypes.h>
+#define EXP_MAX_INPUT  ((int64_t)43 * (1LL << 26))
+#define LN2_FIX        ((int64_t)46516319)
+#define INV_LN2_FIX    ((int64_t)96945817)
 
 uint64_t abs(int64_t val){
 	uint64_t temp = val >> 63;     // make a mask of the sign bit
@@ -20,7 +23,18 @@ uint32_t fact(uint8_t x){
 }
 
 int64_t expfix(int64_t val){
+	if (val >= EXP_MAX_INPUT)  return INT64_MAX;
+    if (val <= -EXP_MAX_INPUT) return 0; // underflows to ~0 in Q26
+	
 	// Maclaurin series expansion for e^x
+	// --- Clamp to prevent guaranteed overflow ---	
+	if (val < 0) { // handles negatives with 1/e^x identity
+        int64_t pos = expfix(-val);
+        if (pos == 0) return INT64_MAX; // guard div/0
+        // 1/pos in Q26: fix(1)^2 / pos
+        return ((int64_t)(1LL << 26) * (1LL << 26)) / pos;
+    }
+	
 	volatile uint16_t N = (10 + (abs(val) >> 26)*5); // iteration scaling
 	volatile int64_t mod = val;
 	volatile int64_t accum = val + fix(1);
@@ -72,33 +86,11 @@ int64_t logfix (int64_t x){
 }
 
 int64_t powerfix(int64_t val, int64_t power){
-	if (val == 0){
-		return 0;
-	}
-
-	volatile int64_t temp = val;
-
-	// natural log of base
-	temp = logfix(temp); // debug val
-
-	// multiply be the power
-	temp = fixed_point_mult(temp, power);
-	
-	// Prep
-	//int64_t	k = fixed_point_div(temp, logfix(fix(2)));
-	//int64_t r = temp - (k*logfix(fix(2))) >> 26;
-	//temp = expfix(r);
-	// calculate the exponential
-	temp = expfix(temp);
-	return temp;
-}
-
-
-uint32_t power_simple(uint32_t val, uint8_t p){
-	uint32_t out = 1;
-	while (p > 0){
-		out = val*out;
-		p--;
-	}
-	return out;
+ // Handle edge cases
+ if (val <= 0) return 0;   // log undefined
+ if (power == 0) return fix(1);
+ volatile uint64_t temp = logfix(val);
+ temp = fixed_point_mult(temp, power);
+ temp = expfix(temp);
+ return temp;
 }

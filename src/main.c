@@ -26,13 +26,12 @@ int main(){
 	
     cli(); // global interrupt disable
 	//low_speed();
-	/*
-    twi_init(); // Initialize i2c
+    
+	twi_init(); // Initialize i2c
 	SSD1306_init(); // Setup the screen
 	SSD1306_clear(); // Clear the screen memory
 	timer_init(); // configure timekeeper
 	configure_WDT_interrupt((uint8_t)5); // configure timer based interrupt to wake sleep
-	*/
     adc_init(); // Configure ADC
 	bhm_init(); // bhm specific configurations
 	sei();
@@ -43,16 +42,16 @@ int main(){
 	uint32_t current;
 	uint32_t voltage;
 	bool batt_warn;
-	volatile uint32_t cycle_time = 0;
-	volatile uint32_t last_cycle = 0;
+	uint32_t cycle_time = 0;
+	uint32_t last_cycle = 0;
 	while(1){
         last_cycle = cycle_time;
-		//cycle_time = tinymillis(); //Measure the length of each measurement cycle
+		cycle_time = tinymillis(); //Measure the length of each measurement cycle
+		display_test_8digit(cycle_time);
 		current = measure_current_draw();
 		voltage = measure_battery_voltage();
-		percent_charge = calculate_charge(voltage);
-		//percent_charge = adv_charge_estimate(voltage, current, &total_charge_estimate, (cycle_time-last_cycle));
-		//batt_warn = percent_charge > 15 ? false : true; // below 15% trigger battery warning
+		percent_charge = adv_charge_estimate(&voltage, &current, &total_charge_estimate, (cycle_time-last_cycle));
+		batt_warn = percent_charge > 15 ? false : true; // below 15% trigger battery warning
 		//calculate time-to-empty
         //update screen
 		// ideas:
